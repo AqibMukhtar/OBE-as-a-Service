@@ -3,7 +3,7 @@ courseId,courseCode,courseName,isPractical
 2,SE-101,SDA,1
 3,TE-201,PWD,0
 4,TE-201,PWD,1
-5,TS-301,LSA,1
+5,TS-301,LSA,0
 6,SE-501,PL,0
 7,TE-501,WDB,0
 8,TS-502,PKK,0
