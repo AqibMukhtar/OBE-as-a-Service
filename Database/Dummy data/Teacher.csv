@@ -1,0 +1,9 @@
+teacherId,teacherEmail,teacherName,programId,teacherDesignationId,teacherGender
+1,taimour@nediuet.edu.pk,Muhammad Taimour,1,Assistant  Professor,Male
+2,khadeeja@nediuet.edu.pk,Khadija Khan,1,Lecturer,Female
+3,rayan@nediuet.edu.pk,Muhammad Rayyan,2,Professor,Male
+4,fatimah@nediuet.edu.pk,Fatima Ali,2,Associate Professor,Female
+5,hassan@nediuet.edu.pk,Muhammad Hassan,3,Chairperson,Male
+6,sheikh@nediuet.edu.pk,Mehfooz Sheikh,3,Lecturer,Male
+7,samia@nediuet.edu.pk,Samia Zahid,4,Associate Professor,Female
+8,ammad@nediuet.edu.pk,Ammad Majid,4,Assistant  Professor,Male
