@@ -100,3 +100,37 @@ BEGIN
 	
     END IF;
 END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `unmapCourseToProgram`(program_id TINYINT, batch_id SMALLINT, 
+course_code CHAR(8), course_name VARCHAR(60), is_practical TINYINT)
+BEGIN
+	DECLARE program_has_course_result TINYINT DEFAULT isProgramHasCourse(program_id, batch_id, course_code, course_name, is_practical);
+	DECLARE batch_correctness_result TINYINT DEFAULT isEffectiveBatchCorrect(batch_id);
+    DECLARE course_id_result SMALLINT DEFAULT getCourseId(course_code, course_name, is_practical);
+    
+    IF batch_correctness_result != 1 THEN
+		SELECT "You can only assign courses to upcomming batches"
+        AS "Message", FALSE AS "Success";
+	ELSEIF program_has_course_result = 1 THEN
+		SELECT CONCAT
+        ("Course Code: ", course_code, " Course Name: ", 
+        course_name, " is_practical: ", is_practical, " doesnot exist in university")
+        AS "Message", FALSE AS "Success";
+	ELSEIF program_has_course_result = 3 THEN
+		SELECT CONCAT
+        ("Course Code: ", course_code, " Course Name: ", 
+        course_name, " is_practical: ", is_practical, " doesnot exist for your program and given batch") 
+        AS "Message", FALSE AS "Success";
+	ELSEIF program_has_course_result = 2 THEN
+		DELETE FROM `obe-as-a-service`.`programcoursejunction`
+		WHERE `programcoursejunction`.`programId` = program_id AND 
+        `programcoursejunction`.`batchId` = batch_id AND 
+        `programcoursejunction`.`courseId` = course_id_result;
+        
+        CALL updateCourseMappingToSections(program_id, batch_id, FALSE, FALSE, TRUE, NULL, course_id_result);
+        SELECT "Course successfully removed" AS "Message", TRUE AS "Success";
+	END IF;
+END
