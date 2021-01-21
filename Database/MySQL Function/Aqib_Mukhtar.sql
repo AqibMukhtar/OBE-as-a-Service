@@ -58,7 +58,7 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `isProgramHasCourse`(program_id TINYINT,
+CREATE DEFINER=`root`@`localhost` FUNCTION `isProgramHasCourse`(program_id TINYINT, batch_id SMALLINT,
 course_code CHAR(8), course_name VARCHAR(60), is_practical TINYINT) RETURNS tinyint(4)
     DETERMINISTIC
 BEGIN
@@ -72,16 +72,15 @@ BEGIN
 	ELSE
 		SET course_in_program = (SELECT COUNT(programCourseId) 
         FROM programcoursejunction WHERE 
-        programId = program_id AND courseId = result);
+        programId = program_id AND courseId = result AND batchId = batch_id);
         
         IF course_in_program = 0 THEN
-			RETURN 3; # Program doesnot have course
+			RETURN 3; # Program and batch doesnot have course
 		ELSE
-			RETURN 2; # Program has course
+			RETURN 2; # Program and batch already has course
 		END IF;
 	END IF;
 END
-
 
 
 
