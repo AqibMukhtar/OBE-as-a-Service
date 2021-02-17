@@ -1,0 +1,74 @@
+[
+	{
+		"ploId" : 1,
+		"ploDisplayId" : "PLO-01",
+		"ploName" : "Engineering Knowledge",
+		"ploDescription" : "An ability to apply knowledge of"
+	},
+	{
+		"ploId" : 2,
+		"ploDisplayId" : "PLO-02",
+		"ploName" : "Problem Analysis",
+		"ploDescription" : "An ability to identify, formulate, research literature,"
+	},
+	{
+		"ploId" : 3,
+		"ploDisplayId" : "PLO-03",
+		"ploName" : "Design/Development of Solutions",
+		"ploDescription" : "An ability to design solutions for"
+	},
+	{
+		"ploId" : 4,
+		"ploDisplayId" : "PLO-04",
+		"ploName" : "Investigation",
+		"ploDescription" : "An ability to investigate complex engineering"
+	},
+	{
+		"ploId" : 5,
+		"ploDisplayId" : "PLO-05",
+		"ploName" : "Modern Tool Usage",
+		"ploDescription" : "An ability to create, select and apply"
+	},
+	{
+		"ploId" : 6,
+		"ploDisplayId" : "PLO-06",
+		"ploName" : "The Engineer and Society",
+		"ploDescription" : "An ability to apply reasoning informed"
+	},
+	{
+		"ploId" : 7,
+		"ploDisplayId" : "PLO-07",
+		"ploName" : "Environment and Sustainability",
+		"ploDescription" : "An ability to understand the"
+	},
+	{
+		"ploId" : 8,
+		"ploDisplayId" : "PLO-08",
+		"ploName" : "Ethics",
+		"ploDescription" : "Apply ethical principles and commit to professional ethics"
+	},
+	{
+		"ploId" : 9,
+		"ploDisplayId" : "PLO-09",
+		"ploName" : "Individual and Team Work",
+		"ploDescription" : "An ability to work effectively, as an"
+	},
+	{
+		"ploId" : 10,
+		"ploDisplayId" : "PLO-10",
+		"ploName" : "Communication",
+		"ploDescription" : "An ability to communicate effectively, orally as"
+	},
+	{
+		"ploId" : 11,
+		"ploDisplayId" : "PLO-11",
+		"ploName" : "Project Management",
+		"ploDescription" : "An ability to demonstrate management"
+	},
+	{
+		"ploId" : 12,
+		"ploDisplayId" : "PLO-12",
+		"ploName" : "Lifelong Learning",
+		"ploDescription" : "An ability to recognize importance of, and"
+	}
+]

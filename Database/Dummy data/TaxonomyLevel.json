@@ -1,0 +1,146 @@
+[
+	{
+		"taxonomyLevelId" : 1,
+		"taxonomyId" : 1,
+		"taxonomyLevelName" : "knowledge",
+		"taxonomyLevelDescription" : "remembering of previously learned material",
+		"taxonomyLevelOrder" : "Lower",
+		"taxonomyLevelShortHand" : "C-1"
+	},
+	{
+		"taxonomyLevelId" : 2,
+		"taxonomyId" : 1,
+		"taxonomyLevelName" : "comprehension",
+		"taxonomyLevelDescription" : "the ability to grasp the meaning of material.",
+		"taxonomyLevelOrder" : "Lower",
+		"taxonomyLevelShortHand" : "C-2"
+	},
+	{
+		"taxonomyLevelId" : 3,
+		"taxonomyId" : 1,
+		"taxonomyLevelName" : "application",
+		"taxonomyLevelDescription" : "the ability to use learned material in new and concrete situations.",
+		"taxonomyLevelOrder" : "Intermediate",
+		"taxonomyLevelShortHand" : "C-3"
+	},
+	{
+		"taxonomyLevelId" : 4,
+		"taxonomyId" : 1,
+		"taxonomyLevelName" : "analysis",
+		"taxonomyLevelDescription" : "the ability to break down material into its component parts so that its organizational structure may be understood.",
+		"taxonomyLevelOrder" : "Intermediate",
+		"taxonomyLevelShortHand" : "C-4"
+	},
+	{
+		"taxonomyLevelId" : 5,
+		"taxonomyId" : 1,
+		"taxonomyLevelName" : "synthesis",
+		"taxonomyLevelDescription" : "the ability to put parts together to form a new whole.",
+		"taxonomyLevelOrder" : "Higher",
+		"taxonomyLevelShortHand" : "C-5"
+	},
+	{
+		"taxonomyLevelId" : 6,
+		"taxonomyId" : 1,
+		"taxonomyLevelName" : "evaluation",
+		"taxonomyLevelDescription" : "the ability to judge the value of material (statement, novel, poem, research report) for a given purpose.",
+		"taxonomyLevelOrder" : "Higher",
+		"taxonomyLevelShortHand" : "C-6"
+	},
+	{
+		"taxonomyLevelId" : 7,
+		"taxonomyId" : 2,
+		"taxonomyLevelName" : "Receiving",
+		"taxonomyLevelDescription" : "Receiving is about the student's memory and recognition as well",
+		"taxonomyLevelOrder" : "Lower",
+		"taxonomyLevelShortHand" : "A-1"
+	},
+	{
+		"taxonomyLevelId" : 8,
+		"taxonomyId" : 2,
+		"taxonomyLevelName" : "Responding",
+		"taxonomyLevelDescription" : "The student actively participates in the learning process",
+		"taxonomyLevelOrder" : "Lower",
+		"taxonomyLevelShortHand" : "A-2"
+	},
+	{
+		"taxonomyLevelId" : 9,
+		"taxonomyId" : 2,
+		"taxonomyLevelName" : "Valuing",
+		"taxonomyLevelDescription" : "The student attaches a value to an object, phenomenon, or piece of information.",
+		"taxonomyLevelOrder" : "Intermediate",
+		"taxonomyLevelShortHand" : "A-3"
+	},
+	{
+		"taxonomyLevelId" : 10,
+		"taxonomyId" : 2,
+		"taxonomyLevelName" : "Organization",
+		"taxonomyLevelDescription" : "The student can put together different values, information, and ideas, and can accommodate them within his/her own schema",
+		"taxonomyLevelOrder" : "Intermediate",
+		"taxonomyLevelShortHand" : "A-4"
+	},
+	{
+		"taxonomyLevelId" : 11,
+		"taxonomyId" : 2,
+		"taxonomyLevelName" : "Internalizat",
+		"taxonomyLevelDescription" : "The student at this level tries to build abstract knowledge.",
+		"taxonomyLevelOrder" : "Higher",
+		"taxonomyLevelShortHand" : "A-5"
+	},
+	{
+		"taxonomyLevelId" : 12,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Perception",
+		"taxonomyLevelDescription" : "The ability to use sensory cues to guide motor activity:",
+		"taxonomyLevelOrder" : "Lower",
+		"taxonomyLevelShortHand" : "P-1"
+	},
+	{
+		"taxonomyLevelId" : 13,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Set",
+		"taxonomyLevelDescription" : "Readiness to act: It includes mental, physical, and emotional sets.",
+		"taxonomyLevelOrder" : "Lower",
+		"taxonomyLevelShortHand" : "P-2"
+	},
+	{
+		"taxonomyLevelId" : 14,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Guided response",
+		"taxonomyLevelDescription" : "The early stages of learning a complex skill that includes imitation and trial and error",
+		"taxonomyLevelOrder" : "Intermediate",
+		"taxonomyLevelShortHand" : "P-3"
+	},
+	{
+		"taxonomyLevelId" : 15,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Mechanism",
+		"taxonomyLevelDescription" : "The intermediate stage in learning a complex skill:",
+		"taxonomyLevelOrder" : "Intermediate",
+		"taxonomyLevelShortHand" : "P-4"
+	},
+	{
+		"taxonomyLevelId" : 16,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Complex overt response",
+		"taxonomyLevelDescription" : "The skillful performance of motor acts that involve complex movement patterns:",
+		"taxonomyLevelOrder" : "Higher",
+		"taxonomyLevelShortHand" : "P-5"
+	},
+	{
+		"taxonomyLevelId" : 17,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Adaptation",
+		"taxonomyLevelDescription" : "Skills are well developed and the individual can modify movement patterns to fit special requirements.",
+		"taxonomyLevelOrder" : "Higher",
+		"taxonomyLevelShortHand" : "P-6"
+	},
+	{
+		"taxonomyLevelId" : 18,
+		"taxonomyId" : 3,
+		"taxonomyLevelName" : "Origination",
+		"taxonomyLevelDescription" : "Creating new movement patterns to fit a particular situation or specific problem:",
+		"taxonomyLevelOrder" : "Higher",
+		"taxonomyLevelShortHand" : "P-7"
+	}
+]

@@ -1,0 +1,98 @@
+[
+	{
+		"programCourseId" : 1,
+		"programId" : 1,
+		"courseId" : 1,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 2,
+		"programId" : 1,
+		"courseId" : 2,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 3,
+		"programId" : 1,
+		"courseId" : 6,
+		"batchId" : 2018
+	},
+	{
+		"programCourseId" : 5,
+		"programId" : 2,
+		"courseId" : 3,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 6,
+		"programId" : 2,
+		"courseId" : 4,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 7,
+		"programId" : 2,
+		"courseId" : 9,
+		"batchId" : 2018
+	},
+	{
+		"programCourseId" : 8,
+		"programId" : 3,
+		"courseId" : 5,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 9,
+		"programId" : 3,
+		"courseId" : 8,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 10,
+		"programId" : 3,
+		"courseId" : 9,
+		"batchId" : 2017
+	},
+	{
+		"programCourseId" : 11,
+		"programId" : 2,
+		"courseId" : 7,
+		"batchId" : 2019
+	},
+	{
+		"programCourseId" : 12,
+		"programId" : 1,
+		"courseId" : 9,
+		"batchId" : 2019
+	},
+	{
+		"programCourseId" : 13,
+		"programId" : 1,
+		"courseId" : 8,
+		"batchId" : 2020
+	},
+	{
+		"programCourseId" : 14,
+		"programId" : 1,
+		"courseId" : 1,
+		"batchId" : 2019
+	},
+	{
+		"programCourseId" : 15,
+		"programId" : 1,
+		"courseId" : 2,
+		"batchId" : 2019
+	},
+	{
+		"programCourseId" : 16,
+		"programId" : 1,
+		"courseId" : 6,
+		"batchId" : 2019
+	},
+	{
+		"programCourseId" : 18,
+		"programId" : 1,
+		"courseId" : 10,
+		"batchId" : 2019
+	}
+]

@@ -1,0 +1,14 @@
+[
+	{
+		"taxonomyId" : 1,
+		"taxonomyDomain" : "Congnitive"
+	},
+	{
+		"taxonomyId" : 2,
+		"taxonomyDomain" : "Affective"
+	},
+	{
+		"taxonomyId" : 3,
+		"taxonomyDomain" : "Psychomotor"
+	}
+]
