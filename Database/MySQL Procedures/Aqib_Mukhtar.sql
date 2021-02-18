@@ -171,7 +171,7 @@ BEGIN
     isCLOPotentialIdCorrect(clo_id_potential);
     
 	DECLARE is_clo_addition_approved BOOLEAN DEFAULT
-    isCLOPotentialIdCorrect(clo_id_potential);
+    isCLOAdditionApproved(clo_id_potential);
     
     DECLARE is_clo_add_comitted BOOLEAN DEFAULT
     isCLOAdditionComitted(clo_id_potential);

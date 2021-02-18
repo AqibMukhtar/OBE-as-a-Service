@@ -220,8 +220,8 @@ clo_description VARCHAR(500) ) RETURNS tinyint(1)
     DETERMINISTIC
 BEGIN
 RETURN (SELECT COUNT(cloId) = 0 FROM systemclo WHERE
-taxonomyLevelId = taxonomy_level_id AND ploId = plo_id AND 
-programCourseId = program_course_id AND cloDescription = clo_description);
+taxonomyLevelId = taxonomy_level_id AND programCourseId = program_course_id 
+AND cloDescription = clo_description);
 END
 
 
