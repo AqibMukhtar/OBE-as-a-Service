@@ -101,3 +101,148 @@ BEGIN
 	END IF;
     
 END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `generateCLOName`(program_course_id SMALLINT) RETURNS char(6) CHARSET utf8mb4
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT CONCAT('CLO-', CONVERT(LPAD(COUNT(cloId)+1, 2, 0), CHAR)) 
+FROM systemclo WHERE programCourseId = program_course_id);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `generatePEOName`(program_id TINYINT) RETURNS char(6) CHARSET utf8mb4
+    DETERMINISTIC
+BEGIN
+	RETURN (SELECT CONCAT('PEO-', CONVERT(LPAD(COUNT(peoId)+1, 2, 0), CHAR))
+    FROM peo WHERE programId = program_id);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `getProgramCourseId`(program_id TINYINT, course_id SMALLINT, batch_id SMALLINT) RETURNS smallint(6)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT programCourseId FROM programCourseJunction WHERE 
+programId = program_id AND courseId = course_id AND batchId = batch_id);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `getTaxonomyLevelId`(taxonomy_level_name VARCHAR(30), taxonomy_domain VARCHAR(20)) RETURNS tinyint(4)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT taxonomyLevelId FROM taxonomylevel WHERE 
+		taxonomyLevelName = taxonomy_level_name AND taxonomyId = (
+		SELECT taxonomyId FROM taxonomydomain WHERE taxonomyDomain = taxonomy_domain));
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isCLOAdditionApproved`(clo_id_potential MEDIUMINT) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT isApproved FROM pendingcloadd WHERE 
+cloIdPotential = clo_id_potential);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isCLOAdditionApprovedByOBE`(clo_id_potential MEDIUMINT, obe_id SMALLINT) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT COUNT(cloAddApproveId) = 1 FROM cloaddapprove WHERE 
+cloIdPotential = clo_id_potential AND obeId = obe_id);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isCLOAdditionComitted`(clo_id_potential MEDIUMINT) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT isCommited FROM pendingcloadd WHERE cloIdPotential = clo_id_potential);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isCLOPotentialIdCorrect`(clo_id_potential MEDIUMINT) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT COUNT(cloIdPotential) = 1 FROM cloadd WHERE
+cloIdPotential = clo_id_potential);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isPEOAdditionCommitRequired`(program_id TINYINT, peo_name CHAR(6)) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+	RETURN (SELECT isCommitRequired FROM peo
+    WHERE programId = program_id AND peoName = peo_name);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isProgramCLOPassingCriteriaCommitRequired`(program_id SMALLINT) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+	RETURN 
+	(SELECT isCommitRequired FROM programpassingcrteria WHERE programId = program_id);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isProgramPassingCriteriaDefined`(program_id TINYINT) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+	RETURN
+    (SELECT COUNT(programId) FROM programpassingcrteria WHERE programId = program_id);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isUniqueSystemCLO`(taxonomy_level_id TINYINT, plo_id TINYINT, program_course_id SMALLINT, 
+clo_description VARCHAR(500) ) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT COUNT(cloId) = 0 FROM systemclo WHERE
+taxonomyLevelId = taxonomy_level_id AND ploId = plo_id AND 
+programCourseId = program_course_id AND cloDescription = clo_description);
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isUniquePEODescription`(program_id SMALLINT, peo_description VARCHAR(500)) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN ( SELECT peo_description NOT IN (
+SELECT peoDescription FROM peo WHERE programId = program_id));
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isUniqueRequestedCLO`(taxonomy_level_id TINYINT, plo_id TINYINT, program_course_id SMALLINT, 
+clo_description VARCHAR(500) ) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+RETURN (SELECT COUNT(pca.cloIdPotential) = 0 FROM 
+pendingcloadd pca JOIN cloadd ca ON pca.cloIdPotential = ca.cloIdPotential
+WHERE taxonomyLevelId = taxonomy_level_id AND ploId = plo_id 
+AND cloDescription = clo_description AND programCourseId = program_course_id);
+END
