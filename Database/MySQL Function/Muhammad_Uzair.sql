@@ -11,3 +11,22 @@ set batch_year = current_batch - batch_id + 1;
 		RETURN 0;
 	end if;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isRecordExisting`(student_id mediumint ) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+	declare count tinyint default (select count(sectionStudentcourseId) from sectionstudentcoursejunction where studentId = student_id);
+	if count>0 then
+		RETURN 1;
+	else
+		return 0;
+	end if;
+END
