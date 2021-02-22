@@ -30,3 +30,19 @@ BEGIN
 		return 0;
 	end if;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `sectionIdVerify`(program_id tinyint, batch_id smallint, section_name char(2)) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+declare is_section_id_present boolean;
+set is_section_id_present = (select count(sectionId) from section where programId = program_id AND batchId = batch_id AND sectionName = section_name );
+RETURN is_section_id_present;
+END
