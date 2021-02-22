@@ -46,3 +46,19 @@ declare is_section_id_present boolean;
 set is_section_id_present = (select count(sectionId) from section where programId = program_id AND batchId = batch_id AND sectionName = section_name );
 RETURN is_section_id_present;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `studentIdVerify`(student_id mediumint) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+declare is_student_id_present boolean;
+set is_student_id_present = (select count(studentId) from student where studentId = student_id );
+RETURN is_student_id_present;
+END
