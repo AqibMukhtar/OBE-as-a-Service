@@ -2,15 +2,15 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addStudents`(program_id tinyint, ba
 BEGIN
 	declare section_verification boolean default sectionIdVerify(program_id, batch_id, section_name);
     declare student_verification boolean default studentIdVerify(student_id);
-    declare batch_verification boolean default batchVerify(batch_id);
+    declare batch_year tinyint default batchYear(batch_id);
     declare section_id smallint;
-    declare record_exists boolean default isRecordExisting(student_id);
+    declare record_exists boolean default isSectionStudentCourseRecordExisting(student_id);
     set section_id = (select sectionId from section where programId = program_id AND batchId = batch_id AND sectionName = section_name);
     if section_verification = 0 then
 		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
 	elseif student_verification = 0 then
 		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
-	elseif batch_verification = 0 then
+	elseif batch_year = 0 || batch_year = 1 then
 		SELECT "you can only add students in current batch or upcoming batch" AS "Message", FALSE AS "Success";
 	else
 		if is_backloger = 1 then
