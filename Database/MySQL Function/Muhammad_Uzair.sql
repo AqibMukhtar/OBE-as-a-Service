@@ -70,3 +70,19 @@ declare is_course_id_present boolean;
 set is_course_id_present = (select count (programCourseId) from programcoursejunction where courseId = course_id and programId = program_id and batchId = batch_id);
 RETURN is_course_id_present;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isSectionTeacherCourseRecordExisting`(section_id smallint, teacher_id mediumint, course_id smallint) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+declare is_record_existing boolean;
+set is_record_existing = (select count(sectionTeacherCourseId) from sectionteachercoursejunction where sectionId = section_id and teacherId = teacher_id and courseId = course_id);
+RETURN is_record_existing;
+END
