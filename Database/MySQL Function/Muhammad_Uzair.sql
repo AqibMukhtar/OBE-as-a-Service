@@ -47,10 +47,10 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `studentIdVerify`(student_id mediumint) RETURNS tinyint(1)
+CREATE DEFINER=`root`@`localhost` FUNCTION `studentIdVerify`(student_id mediumint, program_id tinyint, section_id smallint) RETURNS tinyint(1)
     DETERMINISTIC
 BEGIN
 declare is_student_id_present boolean;
-set is_student_id_present = (select count(studentId) from student where studentId = student_id );
+set is_student_id_present = (select count(studentId) from student where studentId = student_id and programId = program_id and sectionId = section_id );
 RETURN is_student_id_present;
 END
