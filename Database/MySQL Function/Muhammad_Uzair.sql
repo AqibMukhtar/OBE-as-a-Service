@@ -3,7 +3,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `batchYear`(batch_id smallint) RETURN
 BEGIN
 declare current_batch smallint;
 declare batch_year tinyint;
-set current_batch = (select batchId from batch where isCurrent = 1);
+set current_batch = (select batchId from batch where isCurrent = 1 order by batchId desc limit 1);
 set batch_year = current_batch - batch_id + 1;
 Return batch_year;
 END
@@ -16,15 +16,11 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `isSectionStudentCourseRecordExisting`(student_id mediumint ) RETURNS tinyint(1)
+CREATE DEFINER=`root`@`localhost` FUNCTION `isSectionStudentCourseRecordExisting`(student_id mediumint) RETURNS tinyint(1)
     DETERMINISTIC
 BEGIN
-	declare count tinyint default (select count(sectionStudentcourseId) from sectionstudentcoursejunction where studentId = student_id);
-	if count>0 then
-		RETURN 1;
-	else
-		return 0;
-	end if;
+	declare is_record_existing tinyint default (select count(sectionStudentcourseId) from sectionstudentcoursejunction where studentId = student_id);
+	return is_record_existing;
 END
 
 

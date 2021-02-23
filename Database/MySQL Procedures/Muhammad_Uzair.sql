@@ -6,14 +6,14 @@ BEGIN
     declare section_id smallint;
     declare record_exists boolean default isSectionStudentCourseRecordExisting(student_id);
     set section_id = (select sectionId from section where programId = program_id AND batchId = batch_id AND sectionName = section_name);
-    if section_verification = 0 then
+    if !section_verification then
 		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
-	elseif student_verification = 0 then
+	elseif !student_verification then
 		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
 	elseif batch_year = 0 || batch_year = 1 then
 		SELECT "you can only add students in current batch or upcoming batch" AS "Message", FALSE AS "Success";
 	else
-		if is_backloger = 1 then
+		if is_backloger then
 			INSERT INTO `obe-as-a-service`.`sectionstudentcoursejunction`
 			(`sectionId`, `studentId`, `courseId`) VALUES
 			(section_id, student_id, backloger_course_id);
