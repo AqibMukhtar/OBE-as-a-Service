@@ -11,7 +11,7 @@ BEGIN
 		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
 	elseif !student_verification then
 		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
-	elseif batch_year = 1 then
+	elseif batch_year != 1 then
 		SELECT "you can only add students of current batch" AS "Message", FALSE AS "Success";
 	elseif record_exists then
 		SELECT "Record of this student already exist" AS "Message", FALSE AS "Success";
