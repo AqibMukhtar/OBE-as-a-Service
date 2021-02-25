@@ -67,7 +67,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `courseIdVerify`(course_id smallint ,
     DETERMINISTIC
 BEGIN
 declare is_course_id_present boolean;
-set is_course_id_present = (select count (programCourseId) from programcoursejunction where courseId = course_id and programId = program_id and batchId = batch_id);
+set is_course_id_present = (select count(programCourseId) from programcoursejunction where courseId = course_id and programId = program_id and batchId = batch_id);
 RETURN is_course_id_present;
 END
 
