@@ -102,3 +102,19 @@ declare is_teacher_id_present boolean;
 set is_teacher_id_present = (select count(teacherId) from teacher where teacherId = teacher_id and programId = program_id);
 RETURN is_teacher_id_present;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isSectionStudentCourseRecordExistingBackloger`(section_id smallint, student_id mediumint, course_id smallint) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+	declare is_record_existing boolean default (select count(sectionStudentcourseId) from sectionstudentcoursejunction where studentId = student_id and sectionId = section_id and courseId = course_id);
+	return is_record_existing;
+RETURN 1;
+END
