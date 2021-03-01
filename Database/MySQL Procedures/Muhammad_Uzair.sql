@@ -150,3 +150,54 @@ BEGIN
 		drop table temp;
     end if;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addCodEquivalentCourse`(from_program_id tinyint, to_program_id tinyint, from_batch_id smallint, to_batch_id smallint, from_section_name char(2), to_section_name char(2), cod_student_id mediumint, from_course_code char(8), to_course_code char(8), from_course_name varchar(60), to_course_name varchar(60), from_is_practical tinyint, to_is_practical tinyint)
+BEGIN
+	declare from_section_verification boolean default sectionIdVerify(from_program_id, from_batch_id, from_section_name);
+    declare to_section_verification boolean default sectionIdVerify(to_program_id, to_batch_id, to_section_name);
+    declare from_course_verification boolean;
+    declare to_course_verification boolean;
+    declare student_verification boolean;
+	declare from_section_id smallint;
+    declare to_section_id smallint;
+    declare to_batch_year tinyint default batchYear(to_batch_id);
+    declare from_course_id smallint;
+    declare to_course_id smallint;
+    declare course_completion_verification boolean;
+    declare from_record_existing boolean;
+    declare to_record_existing boolean;
+    set from_course_id = (select courseId from course where courseCode = from_course_code and courseName = from_course_name and isPractical = from_is_practical);
+    set to_course_id = (select courseId from course where courseCode = to_course_code and courseName = to_course_name and isPractical = to_is_practical);
+    set from_course_verification = courseIdVerify(from_course_id , from_program_id, from_batch_id);
+    set to_course_verification = courseIdVerify(to_course_id , to_program_id, to_batch_id);
+    set from_section_id = (select sectionId from section where programId = from_program_id AND batchId = from_batch_id AND sectionName = from_section_name);
+    set to_section_id = (select sectionId from section where programId = to_program_id AND batchId = to_batch_id AND sectionName = to_section_name);
+    set student_verification = studentIdVerify(cod_student_id, from_program_id, from_section_id);
+    set course_completion_verification = isCourseCompleted(from_section_id, cod_student_id, from_course_id);
+    set from_record_existing = isSectionStudentCourseRecordExistingBackloger(from_section_id, cod_student_id, from_course_id);
+    set to_record_existing = isSectionStudentCourseRecordExistingBackloger(to_section_id, cod_student_id, to_course_id);
+    if !to_section_verification or !from_section_verification then
+		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
+	elseif !course_completion_verification then
+		SELECT "This course is not completed" AS "Message", FALSE AS "Success";
+	elseif !student_verification then
+		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
+	elseif to_batch_year > 4 or to_batch_year < 1 then
+		SELECT "you can only add students to current batch" AS "Message", FALSE AS "Success";
+	elseif !from_course_verification or !to_course_verification then
+		select "this course doesnot exist" AS "Message", FALSE AS "Success";
+	elseif !from_record_existing or !to_record_existing then
+		select "this record doesnot exist" AS "Message", FALSE AS "Success";
+    else
+		UPDATE sectionstudentcoursejunction SET isCompleted = 1 WHERE sectionId = to_section_id AND courseId = to_course_id AND studentId = cod_student_id;
+		select "successfully updated record" as "message", true as "Success";
+    end if;
+END
