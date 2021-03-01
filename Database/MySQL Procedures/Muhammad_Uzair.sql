@@ -105,3 +105,48 @@ BEGIN
 		SELECT "Student successfully added" AS "Message", TRUE AS "SUCCESS";
     end if;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addCodStudent`(from_program_id tinyint, to_program_id tinyint, from_batch_id smallint, to_batch_id smallint, from_section_name char(2), to_section_name char(2), cod_student_id mediumint)
+BEGIN
+	declare from_section_verification boolean default sectionIdVerify(from_program_id, from_batch_id, from_section_name);
+    declare to_section_verification boolean default sectionIdVerify(to_program_id, to_batch_id, to_section_name);
+	declare to_batch_year tinyint default batchYear(to_batch_id);
+    declare from_batch_year tinyint default batchYear(from_batch_id);
+    declare student_verification boolean;
+	declare from_section_id smallint;
+    declare to_section_id smallint;
+    declare record_exists boolean;
+    set from_section_id = (select sectionId from section where programId = from_program_id AND batchId = from_batch_id AND sectionName = from_section_name);
+    set to_section_id = (select sectionId from section where programId = to_program_id AND batchId = to_batch_id AND sectionName = to_section_name);
+    set student_verification = studentIdVerify(cod_student_id, from_program_id, from_section_id);
+	set record_exists = isSectionStudentCourseRecordExistingCod(cod_student_id, to_section_id);
+    if !to_section_verification or !from_section_verification then
+		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
+	elseif !student_verification then
+		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
+	elseif to_batch_year !=2 then
+		SELECT "you can only add COD students to 2nd year" AS "Message", FALSE AS "Success";
+    elseif from_batch_year !=2 then
+		SELECT "you can only add COD students of 2nd year" AS "Message", FALSE AS "Success";    
+	elseif record_exists then
+		SELECT "Record of this student already exist" AS "Message", FALSE AS "Success";
+	else
+		Create Table temp(courseid smallint not null, sectionid smallint, studentid mediumint, primary key (courseid) );
+		insert into temp(courseid)
+		select courseId from programcoursejunction where programId = to_program_id AND batchId = to_batch_id;
+		UPDATE temp SET studentid = cod_student_id where courseid != 0;
+		UPDATE temp SET sectionid = to_section_id where courseid != 0;
+		INSERT INTO sectionstudentcoursejunction (sectionId, studentId, courseId)
+		SELECT sectionId, studentId, courseid from temp;
+		SELECT "Student successfully added" AS "Message", TRUE AS "SUCCESS";
+		drop table temp;
+    end if;
+END
