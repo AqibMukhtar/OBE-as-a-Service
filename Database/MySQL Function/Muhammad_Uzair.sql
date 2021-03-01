@@ -134,3 +134,18 @@ declare is_course_completed boolean;
 set is_course_completed = (select isCompleted from sectionstudentcoursejunction where sectionId = section_id and studentId = student_id and courseId = course_id);
 RETURN is_course_completed;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isSectionStudentCourseRecordExistingCod`(student_id mediumint, section_id smallint) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+	declare is_record_existing boolean default (select count(sectionStudentcourseId) from sectionstudentcoursejunction where studentId = student_id and sectionId = section_id);
+	return is_record_existing;
+END
