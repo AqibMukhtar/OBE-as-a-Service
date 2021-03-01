@@ -118,3 +118,19 @@ BEGIN
 	return is_record_existing;
 RETURN 1;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `isCourseCompleted`(section_id smallint, student_id mediumint, course_id smallint) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+declare is_course_completed boolean;
+set is_course_completed = (select isCompleted from sectionstudentcoursejunction where sectionId = section_id and studentId = student_id and courseId = course_id);
+RETURN is_course_completed;
+END
