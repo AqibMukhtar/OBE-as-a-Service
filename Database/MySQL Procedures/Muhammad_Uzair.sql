@@ -71,16 +71,19 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addBacklogerStudent`(from_program_id tinyint, to_program_id tinyint, from_batch_id smallint, to_batch_id smallint, from_section_name char(2), to_section_name char(2), backloger_student_id mediumint, course_id smallint)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addBacklogerStudent`(from_program_id tinyint, to_program_id tinyint, from_batch_id smallint, to_batch_id smallint, from_section_name char(2), to_section_name char(2), backloger_student_id mediumint, course_code char(8), course_name varchar(60), is_practical tinyint)
 BEGIN
 	declare from_section_verification boolean default sectionIdVerify(from_program_id, from_batch_id, from_section_name);
     declare to_section_verification boolean default sectionIdVerify(to_program_id, to_batch_id, to_section_name);
-    declare course_verification boolean default courseIdVerify(course_id , to_program_id, to_batch_id);
+    declare course_verification boolean;
     declare student_verification boolean;
 	declare from_section_id smallint;
     declare to_section_id smallint;
     declare to_batch_year tinyint default batchYear(to_batch_id);
     declare record_exists boolean;
+    declare course_id smallint;
+    set course_id = (select courseId from course where courseCode = course_code and courseName = course_name and isPractical = is_practical);
+    set course_verification = courseIdVerify(course_id , to_program_id, to_batch_id);
     set from_section_id = (select sectionId from section where programId = from_program_id AND batchId = from_batch_id AND sectionName = from_section_name);
     set to_section_id = (select sectionId from section where programId = to_program_id AND batchId = to_batch_id AND sectionName = to_section_name);
     set student_verification = studentIdVerify(backloger_student_id, from_program_id, from_section_id);
