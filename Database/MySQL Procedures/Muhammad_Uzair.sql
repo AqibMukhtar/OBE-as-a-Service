@@ -233,3 +233,24 @@ BEGIN
         UPDATE sectionstudentcoursejunction SET sectionId = section_id where studentId = student_id;
 	end if;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateTeacher`(teacher_current_email varchar(50), current_program_id tinyint, teacher_changed_email varchar(50), changed_program_id tinyint, teacher_name varchar(50), teacher_designation_id varchar(30), teacher_gender char(6))
+BEGIN
+	declare teacher_verification boolean;
+	declare teacher_id smallint;
+    set teacher_id = (select teacherId from teacher where teacherEmail = teacher_current_email);
+    set teacher_verification = teacherIdVerify(teacher_id, current_program_id);
+    if !teacher_verification then
+		SELECT "This teacher does not exist" AS "Message", FALSE AS "Success";
+	else
+		update teacher set teacherEmail = teacher_changed_email, teacherName = teacher_name, programId = changed_program_id, teacherDesignationId = teacher_designation_id, teacherGender = teacher_gender where teacherId = teacher_Id;
+    end if;    
+END
