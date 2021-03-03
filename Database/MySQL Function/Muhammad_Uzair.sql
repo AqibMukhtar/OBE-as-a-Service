@@ -149,3 +149,19 @@ BEGIN
 	declare is_record_existing boolean default (select count(sectionStudentcourseId) from sectionstudentcoursejunction where studentId = student_id and sectionId = section_id);
 	return is_record_existing;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `studentUpdateVerify`(student_id mediumint, program_id tinyint) RETURNS tinyint(1)
+    DETERMINISTIC
+BEGIN
+declare student_verification boolean;
+set student_verification = (select count(studentId) from student where studentId = student_id and programId = program_id);
+RETURN student_verification;
+END
