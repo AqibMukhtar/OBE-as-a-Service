@@ -36,14 +36,17 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addTeachers`(program_id tinyint, batch_id smallint, section_name char(2), teacher_id mediumint, course_id smallint)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addTeachers`(program_id tinyint, batch_id smallint, section_name char(2), teacher_email varchar(50), course_id smallint)
 BEGIN
 declare section_verification boolean default sectionIdVerify(program_id, batch_id, section_name);
-declare teacher_verification boolean default teacherIdVerify(teacher_id, program_id);
 declare batch_year tinyint default batchYear(batch_id);
+declare teacher_verification boolean;
+declare teacher_id smallint;
 declare section_id smallint;
 declare record_exists boolean;
 declare is_completed boolean;
+set teacher_id = (select teacherId from teacher where teacherEmail = teacher_email);
+set teacher_verification = teacherIdVerify(teacher_id, program_id);
 set section_id = (select sectionId from section where programId = program_id AND batchId = batch_id AND sectionName = section_name);
 set record_exists = isSectionteacherCourseRecordExisting(section_id, teacher_id, course_id);
 set is_completed = (select isCompleted from sectionteachercoursejunction where sectionId = section_id and courseId = course_id);
