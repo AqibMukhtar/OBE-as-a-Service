@@ -204,3 +204,32 @@ BEGIN
 		select "successfully updated record" as "message", true as "Success";
     end if;
 END
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateStudent`(student_id mediumint, program_id tinyint, section_name char(2), student_name varchar(50), student_gender char(6), student_email varchar(50), student_roll_number char(10))
+BEGIN
+	declare student_verification boolean;
+    declare section_id smallint;
+    declare batch_id smallint;
+    declare section_verification boolean;
+    set batch_id = (select batchId from student where studentId = student_id);
+    set section_id = (select sectionId from section where programId = program_id and batchId = batch_id and sectionName = section_name);
+    set student_verification = studentUpdateVerification(student_id, program_id);
+    set section_verification = sectionIdVerify(program_id, batch_id, section_name);
+    if !student_verification then
+		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
+	elseif !section_verification then
+		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
+	else
+		UPDATE student SET sectionId = section_id, studentName = student_name, studentGender = student_gender, studentEmail = student_email, studentRollNumber = student_roll_number  WHERE studentId = student_id;
+		select "successfully updated record" as "message", true as "Success";
+        UPDATE sectionstudentcoursejunction SET sectionId = section_id where studentId = student_id;
+	end if;
+END
