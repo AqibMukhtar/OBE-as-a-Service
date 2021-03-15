@@ -1,21 +1,19 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addStudents`(program_id tinyint, batch_id smallint, section_name char(2), student_id mediumint)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addStudents`(program_id tinyint, batch_id smallint, section_name char(2), student_id mediumint, student_name varchar(50) , student_gender char(6), student_email varchar(50), student_roll_number char(10))
 BEGIN
 	declare section_verification boolean default sectionIdVerify(program_id, batch_id, section_name);
-    declare student_verification boolean;
 	declare section_id smallint;
     declare batch_year tinyint default batchYear(batch_id);
     declare record_exists boolean default isSectionStudentCourseRecordExisting(student_id);
     set section_id = (select sectionId from section where programId = program_id AND batchId = batch_id AND sectionName = section_name);
-    set student_verification = studentIdVerify(student_id, program_id, section_id);
     if !section_verification then
 		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
-	elseif !student_verification then
-		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
 	elseif batch_year != 1 then
 		SELECT "you can only add students of current batch" AS "Message", FALSE AS "Success";
 	elseif record_exists then
 		SELECT "Record of this student already exist" AS "Message", FALSE AS "Success";
 	else
+		INSERT INTO student (studentId, sectionId, programId, batchId, studentName, studentGender, studentEmail, studentRollNumber)
+        VALUES (student_id, section_id, program_id, batch_id, student_name, student_gender, student_email, student_roll_number);
 		Create Table temp(courseid smallint not null, sectionid smallint, studentid mediumint, primary key (courseid) );
 		insert into temp(courseid)
 		select courseId from programcoursejunction where programId = program_id AND batchId = batch_id;
