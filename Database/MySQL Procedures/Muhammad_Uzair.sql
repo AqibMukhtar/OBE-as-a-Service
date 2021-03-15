@@ -115,7 +115,7 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addCodStudent`(from_program_id tinyint, to_program_id tinyint, from_batch_id smallint, to_batch_id smallint, from_section_name char(2), to_section_name char(2), cod_student_id mediumint)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addCodStudent`(from_program_id tinyint, to_program_id tinyint, from_batch_id smallint, to_batch_id smallint, from_section_name char(2), to_section_name char(2), cod_student_id mediumint, to_roll_number char(10))
 BEGIN
 	declare from_section_verification boolean default sectionIdVerify(from_program_id, from_batch_id, from_section_name);
     declare to_section_verification boolean default sectionIdVerify(to_program_id, to_batch_id, to_section_name);
@@ -147,6 +147,7 @@ BEGIN
 		UPDATE temp SET sectionid = to_section_id where courseid != 0;
 		INSERT INTO sectionstudentcoursejunction (sectionId, studentId, courseId)
 		SELECT sectionId, studentId, courseid from temp;
+        Update student SET programId = to_program_id, sectionId = to_section_id, studentRollNumber = to_roll_number where studentId = cod_student_id;
 		SELECT "Student successfully added" AS "Message", TRUE AS "SUCCESS";
 		drop table temp;
     end if;
@@ -181,7 +182,7 @@ BEGIN
     set to_course_verification = courseIdVerify(to_course_id , to_program_id, to_batch_id);
     set from_section_id = (select sectionId from section where programId = from_program_id AND batchId = from_batch_id AND sectionName = from_section_name);
     set to_section_id = (select sectionId from section where programId = to_program_id AND batchId = to_batch_id AND sectionName = to_section_name);
-    set student_verification = studentIdVerify(cod_student_id, from_program_id, from_section_id);
+    set student_verification = studentIdVerify(cod_student_id, to_program_id, to_section_id);
     set course_completion_verification = isCourseCompleted(from_section_id, cod_student_id, from_course_id);
     set from_record_existing = isSectionStudentCourseRecordExistingBackloger(from_section_id, cod_student_id, from_course_id);
     set to_record_existing = isSectionStudentCourseRecordExistingBackloger(to_section_id, cod_student_id, to_course_id);
@@ -191,7 +192,7 @@ BEGIN
 		SELECT "This course is not completed" AS "Message", FALSE AS "Success";
 	elseif !student_verification then
 		SELECT "This student does not exist" AS "Message", FALSE AS "Success";
-	elseif to_batch_year > 4 or to_batch_year < 1 then
+	elseif to_batch_year != 2 then
 		SELECT "you can only add students to current batch" AS "Message", FALSE AS "Success";
 	elseif !from_course_verification or !to_course_verification then
 		select "this course doesnot exist" AS "Message", FALSE AS "Success";
