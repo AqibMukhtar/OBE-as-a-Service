@@ -401,3 +401,25 @@ BEGIN
 RETURN (SELECT COUNT(cloAddApproveId) = 1 FROM cloaddapprove WHERE 
 cloIdPotential = clo_id_potential AND obeId = obe_id);
 END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `approvePEOAddition`(program_id SMALLINT, obe_id SMALLINT, peo_description VARCHAR(500), plo_id TINYINT)
+BEGIN
+	# Procedure to add new PEO to Program
+    DECLARE mappedPEO CHAR(6) DEFAULT ploIsMappedTo(program_id, plo_id);
+    DECLARE new_peo_name CHAR (6) DEFAULT generatePEOName(program_id);
+	
+    IF mappedPEO IS NOT NULL THEN
+		SELECT CONCAT("PLO-", plo_id, " is already mapped to ", mappedPEO) AS "Message",
+        FALSE AS "Success";
+	ELSE 
+		INSERT INTO `obe-as-a-service`.`peo`
+        (`ploid`,`programId`,`approvedBy`,`peoName`,`peoDescription`)
+		VALUES (plo_id, program_id, obe_id, new_peo_name, peo_description);
+
+		SELECT CONCAT("New PEO added as ", new_peo_name, ". Contact Admin for commit") AS "Message",
+        TRUE AS "Success";
+	END IF;
+END

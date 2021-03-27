@@ -690,35 +690,23 @@ SELECT "Passing Criteria has been updated. Contact Admin to commit changes"
 END
 IF;
 END
-CREATE DEFINER=`root`@`localhost` PROCEDURE `approvePEOAddition`
-(program_id SMALLINT, obe_id SMALLINT, peo_description VARCHAR
-(500), plo_id TINYINT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `approvePEOAddition`(program_id SMALLINT, obe_id SMALLINT, peo_description VARCHAR(500), plo_id TINYINT)
 BEGIN
-	# Procedure to
-add new PEO to Program
-DECLARE is_unique_peo_description BOOLEAN DEFAULT 
-    isUniquePEODescription
-(program_id, peo_description);
+	# Procedure to add new PEO to Program
+    DECLARE mappedPEO CHAR(6) DEFAULT ploIsMappedTo(program_id, plo_id);
+    DECLARE new_peo_name CHAR (6) DEFAULT generatePEOName(program_id);
+	
+    IF mappedPEO IS NOT NULL THEN
+		SELECT CONCAT("PLO-", plo_id, " is already mapped to ", mappedPEO) AS "Message",
+        FALSE AS "Success";
+	ELSE 
+		INSERT INTO `obe-as-a-service`.`peo`
+        (`ploid`,`programId`,`approvedBy`,`peoName`,`peoDescription`)
+		VALUES (plo_id, program_id, obe_id, new_peo_name, peo_description);
 
-DECLARE new_peo_name CHAR
-(6) DEFAULT generatePEOName
-(program_id);
-
-IF is_unique_peo_description = FALSE THEN
-SELECT "PEO Description already exists for your program" AS "Message",
-	FALSE AS "Success";
-ELSE
-INSERT INTO `
-obe-as-a-service
-`.`peo`
-(`ploid`,`programId`,`approvedBy`,`peoName`,`peoDescription`)
-		VALUES
-(plo_id, program_id, obe_id, new_peo_name, peo_description);
-
-SELECT CONCAT("New PEO added as ", new_peo_name, ". Contact Admin for commit") AS "Message",
-	TRUE AS "Success";
-END
-IF;
+		SELECT CONCAT("New PEO added as ", new_peo_name, ". Contact Admin for commit") AS "Message",
+        TRUE AS "Success";
+	END IF;
 END
 CREATE DEFINER=`root`@`localhost` PROCEDURE `addCLORequestByTeacher`
 (program_id TINYINT, teacher_id SMALLINT,
