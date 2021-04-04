@@ -1,30 +1,31 @@
 import express from 'express';
-import fs from 'fs';
-import https from 'https';
+import {readFileSync} from 'fs';
+import {createServer} from 'https';
+import jwt from 'jsonwebtoken';
 
-import warning from './services/warning.mjs';
+import peoManagement from './services/peoManagement.mjs';
 
 import authenticate from "./operations/authentication.mjs";
-import authorize from "./operations/authorization.mjs";
 
-import {getAllEndPointsNames, getAPIGatewayPort} from "./apigatewayconfig.mjs";
+import {getAPIGatewayPort} from "./apigatewayconfig.mjs";
 
 
 const app = express();
-const validUrls = getAllEndPointsNames();
 
-app.use(({originalUrl}, res, next) => {
-    if (validUrls.includes(originalUrl)) next();
-    else res.sendStatus(404);
-});
-app.use(authenticate, authorize);
-app.use('/api/warning', warning);
-app.get('*', (req, res) => {res.send('Invalid URL')});
+app.use(authenticate);
+app.use('/api/peo_management', peoManagement);
+app.get('/token', (req, res) => {
+  res.send(jwt.sign({uid:1, pid:1, tid:3}, "topsecret"));
+})
+app.all('*', (req, res) => res.sendStatus(404)); 
 
-https.createServer({
-    key: fs.readFileSync('./https/server.key'),
-    cert: fs.readFileSync('./https/server.cert')
+createServer({
+    key: readFileSync('./https/server.key'),
+    cert: readFileSync('./https/server.cert')
   }, app)
   .listen(getAPIGatewayPort(), function () {
     console.log('API Gateway running over HTTPS on default port');
   })
+
+  //tid2 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInBpZCI6MSwidGlkIjoyLCJpYXQiOjE2MTc0MzQ5NjF9.EsEs6H55lDmVxi8oF80_8r-OEc1W6pczKUSSEDv-KiI
+  //tid3 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInBpZCI6MSwidGlkIjozLCJpYXQiOjE2MTc0MzU1ODF9.koa38_gTzK2GSPFsvCm7wM_jBGZu7BBc8pZ4UNr9MC8

@@ -1,0 +1,24 @@
+{
+  "name": "peo-management-service",
+  "version": "1.0.0",
+  "description": "\"PEO Management service for OBEaaS\"",
+  "main": "peoManagementService.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AqibMukhtar/OBE-as-a-Service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AqibMukhtar/OBE-as-a-Service/issues"
+  },
+  "homepage": "https://github.com/AqibMukhtar/OBE-as-a-Service#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  }
+}

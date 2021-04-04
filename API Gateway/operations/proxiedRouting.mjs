@@ -1,13 +1,22 @@
 import axios from "axios";
 import { findServiceIp } from "../apigatewayconfig.mjs";
 
-async function getProxyRequest (req, res) {
-    const {user, originalUrl : endPoint, baseUrl} = req;
-    const serviceName = baseUrl.replace("/api/", "");
+function mergeObjectsValid (formData, user) {
+    const formDataKeys = Object.keys(formData);
+    for(let ids in user)
+        if(formDataKeys.includes(ids)) return false;
+    return true;
+}
 
+async function getProxyRequest (req, res) {
+    const {user, originalUrl : endPoint, baseUrl, body: formData} = req;
+    const serviceName = baseUrl.replace("/api/", "");
     const url = findServiceIp(serviceName) + endPoint;
+    let data;
+    if(mergeObjectsValid(formData, user)) data = {...formData, ...user};
+    else return res.sendStatus(400);
     try {
-        const response = await axios.get(url, {params:user});
+        const response = await axios.get(url, {params:data});
         res.send({ requestStatus:true, data: response.data });
     }
     catch (err) {
@@ -15,10 +24,32 @@ async function getProxyRequest (req, res) {
     }
 }
 
-export {getProxyRequest};
+async function postProxyRequest (req, res) {
+    const {user, originalUrl : endPoint, baseUrl, body: formData} = req;
+    const serviceName = baseUrl.replace("/api/", "");
 
-// async function fun() {
-//     console.log(await getProxyRequest("warning", "/api/warning/teacher/incomplete_clo_assessment/"));
-// }
+    const url = findServiceIp(serviceName) + endPoint;
+    try {
+        const response = await axios.post(url, {user, formData});
+        res.send({ requestStatus:true, data: response.data });
+    }
+    catch (err) {
+        res.send({ requestStatus:false, err });
+    }
+}
 
-// fun();
+async function putProxyRequest (req, res) {
+    const {user, originalUrl : endPoint, baseUrl, body: formData} = req;
+    const serviceName = baseUrl.replace("/api/", "");
+
+    const url = findServiceIp(serviceName) + endPoint;
+    try {
+        const response = await axios.put(url, {user, formData});
+        res.send({ requestStatus:true, data: response.data });
+    }
+    catch (err) {
+        res.send({ requestStatus:false, err });
+    }
+}
+
+export {getProxyRequest, postProxyRequest, putProxyRequest};
