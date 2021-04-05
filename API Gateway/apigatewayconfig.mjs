@@ -20,6 +20,37 @@ const configurationData = {
                     "authUsers" : [3]
                 }
             ]
+        },
+        "clo_request" : {
+            "ip" : "127.0.0.1",
+            "protocol" : "http",
+            "port" : "4000",
+            "endpoints" : [
+                {
+                    "name" : "/api/clo_request/teacher/add_clo",
+                    "authUsers" : [1]
+                },
+                {
+                    "name" : "/api/clo_request/teacher/update_clo",
+                    "authUsers" : [1]
+                },
+                {
+                    "name" : "/api/clo_request/teacher/delete_clo",
+                    "authUsers" : [1]
+                },
+                {
+                    "name" : "/api/clo_request/obe_cell/add_clo",
+                    "authUsers" : [2]
+                },
+                {
+                    "name" : "/api/clo_request/obe_cell/update_clo",
+                    "authUsers" : [2]
+                },
+                {
+                    "name" : "/api/clo_request/obe_cell/delete_clo",
+                    "authUsers" : [2]
+                },
+            ]
         }
     }
 }
