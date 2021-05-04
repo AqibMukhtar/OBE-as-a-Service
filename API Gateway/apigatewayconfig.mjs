@@ -77,8 +77,28 @@ const configurationData = {
       port: '6000',
       endpoints: [
         {
-          name: '/api/peo_management/obe_cell/add_peo',
+          name: '/api/password_auth',
           authUsers: [1, 2, 3, 4]
+        }
+      ]
+    },
+    clo_approve: {
+      ip: '127.0.0.1',
+      protocol: 'http',
+      port: '7000',
+      endpoints: [
+        {
+          name: '/api/clo_approve/add_clo/:add_id',
+          authUsers: [2]
+        },
+        {
+          name: '/api/clo_approve/update_clo/:update_id',
+          authUsers: [2]
+        },
+        ,
+        {
+          name: '/api/clo_approve/delete_clo/:delete_id',
+          authUsers: [2]
         }
       ]
     }
