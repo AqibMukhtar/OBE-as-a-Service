@@ -1,0 +1,86 @@
+.footer1 {
+  position: relative;
+  color: black;
+  background: rgb(211, 206, 206);
+  bottom: 0;
+  left: 0;
+  padding: 20px 0 0px 0;
+  margin-top: 100px;
+  width: 100%;
+  display: flex;
+}
+
+h4 {
+  font-weight: 500 !important;
+}
+.footer-container {
+  float: left;
+  /* width: 33.33%; */
+  background: rgb(211, 206, 206);
+  bottom: 0px;
+  max-height: 200%;
+}
+
+.below {
+  background-color: rgb(85, 85, 85);
+  color: rgb(223, 223, 223);
+  bottom: 0px;
+  position: relative;
+  float: left;
+  width: 100%;
+  height: 2.5rem;
+  left: 0px;
+  display: flex;
+}
+
+.container-content {
+  margin: -0.5% 50px 30px 30px;
+  font-weight: bold;
+  font-size: 15px;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.container-child {
+  margin: 0px 50px 10px 50px;
+  background: rgb(211, 206, 206);
+  font-size: 15px;
+  /* height: auto; */
+}
+.below-side {
+  float: left;
+  width: 50%;
+  margin-right: 20px;
+  font-size: 15px;
+}
+.i-element {
+  color: rgb(56, 53, 53);
+  background-color: white;
+  float: right;
+  padding: 4px;
+  margin-top: 6px;
+  margin-bottom: 1px;
+  margin-right: 10px;
+}
+.i-element:hover {
+  color: white;
+  background-color: rgb(56, 53, 53);
+  /* border: 1px solid #254a8b; */
+}
+span i {
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 700px) {
+  .container-child {
+    margin: 0px 20px 10px 10px;
+    background: rgb(211, 206, 206);
+    font-size: 14px;
+    /* height: auto; */
+  }
+  h4 {
+    font-weight: 500 !important;
+    font-size: 18px !important;
+  }
+}

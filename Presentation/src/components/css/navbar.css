@@ -1,0 +1,44 @@
+.topDiv {
+  background: #4472c4;
+  height: 30px;
+}
+.setMargin {
+  margin-right: 40px;
+}
+
+.navbar {
+  background-color: #254a8b !important;
+}
+.nav-link {
+  color: white !important;
+  font-size: 16px;
+  font-weight: 600;
+  font-style: bold !important;
+}
+.nav-link:hover {
+  font-style: bold !important;
+  font-size: 20px;
+}
+i {
+  color: #254a8b;
+  background-color: white;
+  float: right;
+  padding: 4px;
+  margin-top: 3px;
+  margin-bottom: 1px;
+  margin-right: 10px;
+}
+i:hover {
+  color: white;
+  background-color: #254a8b;
+  /* border: 1px solid #254a8b; */
+}
+span i {
+  border-radius: 20px;
+  cursor: pointer;
+}
+.navbar-toggler {
+  background-color: white !important;
+  opacity: 0.7;
+  border-radius: 20px !important;
+}
