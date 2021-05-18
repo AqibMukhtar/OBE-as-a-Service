@@ -3,57 +3,100 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addAssessmentToolFinalPractical`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       total_Marks tinyint 
 )
 BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calCloId mediumint;
-      declare calSectionTeacherCourseId int;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getCloId mediumint;
+      declare getSectionTeacherCourseId int;
       declare isRepeat smallint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
       
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name);  
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=1);
+		  set getToolId=getToolId(tool_Name);  
            
-             if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-	
-			set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
+             if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+	      
+           set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		     if(getSectionId!=0) then 
+    
+			set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
 			  
-					if (!(calSectionTeacherCourseId is null)) then
+					if (!(getSectionTeacherCourseId is null)) then
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                       
 					if(!(total_Marks<=0 or total_Marks is null)) then
-			        set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                      if(calCloId !=0) then
+			        set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                      if(getCloId !=0) then
                        if(isPracticalFinal(tool_Name)!=0) then
                
-						  if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both')
-						   OR (isTeacherValid(teacher_Id,section_Id,course_Name)='Practical')
+						  if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both')
+						   OR (isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical')
 							 then
                              
-         set isRepeat=(select finalId from assignedtoolclofinal where 
-                   toolId=calToolId AND cloId=calCloId AND sectionTeacherCourseId=calSectionTeacherCourseId);
-				   if(isRepeat is null) then                   
+         set isRepeat=getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+				   
+		 set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+                    
+                    if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    end if;
+                    
+				set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                    set getFinalMarks=getFinalMarks+total_Marks;
+                    else 
+                    set getFinalMarks= getFinalMarks+total_Marks;
+                    end if;
+                    
+				if(getFinalMarks<31) then
+                   
+                   if(isRepeat is null) then                   
 		
 							  insert into assignedtoolclofinal
 							   values 
 							 (default,
-							 calToolId,
-							 calCloId,
-							 calSectionTeacherCourseId,
-							 total_Marks);
+							 getToolId,
+							 getCloId,
+							 getSectionTeacherCourseId,
+							 total_Marks,
+                             default);
 							   select 'Record has been added successfully' AS 'Message', true as 'Success';
+
+                
+                set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+			call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,20,30); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
       
 		else
 		select 'You have already added this record' AS 'Message', false as 'Success';
 		end if;
       
+       else
+	select 'Total Final Makrs should not be greater than 30' AS 'Message', false AS 'Success';
+	end if;
        else 
           select 'You can only add assessment tool for practical/ section you are teaching' 
           AS 'Message', false as 'Success';
@@ -62,10 +105,13 @@ BEGIN
 			select 'Tool should be from Final Practical Tools' AS 'Message', false as 'Success';
 	   end if;
           else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			   end if;
            else
              SELECT "Total marks should not be negative or null" AS "Message", FALSE AS "Success";
+			   end if;
+		   else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
            else
                     SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -76,10 +122,172 @@ BEGIN
           else
                SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
 			   end if;
+		else 
+           select 'Secion not exist' AS 'Message', false as 'Success';
+        end if;
        else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addAssessmentToolFinalTheory`(
+	  program_Name varchar(50),
+      batch_Id smallint,
+      teacher_Id smallint,
+      course_Name varchar(20),
+      course_Code char(8),
+      section_Name char(2),
+      tool_Name varchar(20),
+	  clo_Name char(6),
+      total_Marks tinyint)
+BEGIN
+
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+	  declare getCloId mediumint;
+      declare isRepeat smallint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
+      
+	   if(select batchId from batch 
+      where (batchId=batch_Id and isCurrent=1)) then
+      
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=0);
+		  set getToolId=getToolId(tool_Name); 
+         
+          set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+		
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                      set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                    if (!(total_Marks<=0 OR total_Marks is null)) then
+                     set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
+                      if(isFinal(tool_Name)!=0) then
+               
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory') then
+
+                   set isRepeat=getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+				  
+                   set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+                    
+                    if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    end if;
+                    
+				   set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                    set getFinalMarks=getFinalMarks+total_Marks;
+                    else 
+                    set getFinalMarks= getFinalMarks+total_Marks;
+                    end if;
+                    
+                    
+                    if(getFinalMarks<61) then
+                  
+                  if(isRepeat is null) then
+                   insert into assignedtoolclofinal
+					values 
+					 (default,
+					 getToolId,
+					 getCloId,
+					 getSectionTeacherCourseId,
+					 total_Marks,
+                     default);
+					   select 'Record has been added successfully' AS 'Message', true as 'Success';
+                    
+                
+                set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+			    call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,40,60); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
+    
+    else 
+     select 'You have already added this record' as 'Message', false as 'Success';
+    end if;
+     else
+	select 'Total Final Makrs should not be greater than 60' AS 'Message', false AS 'Success';
+	end if;
+	   else 
+			select 'You are not teaching pratical for this course' AS 'Message', false as 'Success';
+	   end if;
+			else 
+          select 'Tool should be from final tools'AS 'Message', false as 'Success';
+       end if;
+         else
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+                else
+               SELECT "Total marks should not be negative or null" AS "Message", FALSE AS "Success";
+			   end if;
+               
+                else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
+			   end if;
+               	else
+					SELECT "Section Teacher Course Id not exist" AS "Message", FALSE AS "Success";
+					end if;
+         else
+               SELECT "Tool Name is incorrect" AS "Message", FALSE AS "Success";
+			   end if;
+         else
+               SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
+			   end if;
+	   else 
+          select 'Section not exist' AS 'Message', false as 'Success';
+       end if;
+      else
+			select 'Batch is not active' AS 'Message',false as 'Success';
+       end if;
+END
+
+
+
+
+
 
 
 
@@ -103,55 +311,95 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addAssessmentToolSessionalPractical
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       total_Marks tinyint   
 )
 BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calCloId mediumint;
-      declare calSectionTeacherCourseId int;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getCloId mediumint;
+      declare getSectionTeacherCourseId int;
       declare isRepeat smallint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
   
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name);  
-		  
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=1);
+		  set getToolId=getToolId(tool_Name);  
+		  set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
            
-             if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
+             if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
 		
-			set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
+			set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
 			  
-					if (!(calSectionTeacherCourseId is null)) then
+					if (!(getSectionTeacherCourseId is null)) then
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+                        if(isCourseCompleted=0) then
 					if(!(total_Marks<=0 or total_Marks is null)) then
-			          set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                      if(calCloId !=0) then
+			          set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                      if(getCloId !=0) then
                       if(isPracticalSessional(tool_Name)!=0) then
                
-						if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both'
-					    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Practical') then 
-             set isRepeat=(select sessionalId from assignedtoolclosessional where 
-               toolId=calToolId AND cloId=calCloId AND sectionTeacherCourseId=calSectionTeacherCourseId);
-			if(isRepeat is null) then
+						if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both'
+					    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical') then 
+             set isRepeat=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
+			
+             set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+            
+			if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    set getSessionalMarks=getSessionalMarks+total_Marks;
+                    else 
+                    set getSessionalMarks= getSessionalMarks+total_Marks;
+                    end if;
+                    
+				set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+               
+				if(getFinalMarks is null) then
+                set getFinalMarks=0;
+                end if;
+                    
+			if(getSessionalMarks<21) then
+            
+            
+            if(isRepeat is null) then
 					   insert into assignedtoolclosessional
 					   values 
 						 (default,
-						 calToolId,
-						 calCloId,
-						 calSectionTeacherCourseId,
-						 total_Marks);
+						 getToolId,
+						 getCloId,
+						 getSectionTeacherCourseId,
+						 total_Marks,
+                         default);
 						   select 'Record has been added successfully' AS 'Message', true as 'Success';
+                
+                set getCountOfClo= getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+			     call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,20,30); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
+            
                else
                 select 'You have already added this record' AS 'Message', false as 'Success';
                 end if;
       
-      
+       else
+	select 'Total Sessional Makrs should not be greater than 20' AS 'Message', false AS 'Success';
+	end if;
        else 
           select 'You can only add assessment tool for theory/ section you are teaching' 
           AS 'Message', false as 'Success';
@@ -160,10 +408,13 @@ BEGIN
 			select 'Tool should be from Sessional Tools' AS 'Message', false as 'Success';
 	   end if;
           else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			   end if;
            else
              SELECT "Total marks should not be negative or null" AS "Message", FALSE AS "Success";
+			   end if;
+			else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
            else
                     SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -174,6 +425,9 @@ BEGIN
           else
                SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
 			   end if;
+		 else 
+          select 'Section not exist' AS 'Message', false as 'Success';
+         end if;
        else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
@@ -186,88 +440,6 @@ END
 
 
 
-
-
-
-
-
-
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addAssessmentToolFinalTheory`(
-	  program_Name varchar(50),
-      batch_Id smallint,
-      teacher_Id smallint,
-      course_Name varchar(20),
-      section_Id smallint,
-      tool_Name varchar(20),
-	  clo_Name char(6),
-      total_Marks tinyint)
-BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-	  declare calCloId mediumint;
-      declare isRepeat smallint;
-      
-	   if(select batchId from batch 
-      where (batchId=batch_Id and isCurrent=1)) then
-      
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
-           
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-                    if (!(total_Marks<=0 OR total_Marks is null)) then
-                     set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
-                      if(isFinal(tool_Name)!=0) then
-               
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Theory') then
-
-                   set isRepeat=(select finalId from assignedtoolclofinal where 
-                   toolId=calToolId AND cloId=calCloId AND sectionTeacherCourseId=calSectionTeacherCourseId);
-				   if(isRepeat is null) then
-                   insert into assignedtoolclofinal
-					values 
-					 (default,
-					 calToolId,
-					 calCloId,
-					 calSectionTeacherCourseId,
-					 total_Marks);
-					   select 'Record has been added successfully' AS 'Message', true as 'Success';
-    
-    else 
-     select 'You have already added this record' as 'Message', false as 'Success';
-    end if;
-	   else 
-			select 'You are not teaching pratical for this course' AS 'Message', false as 'Success';
-	   end if;
-			else 
-          select 'Tool should be from final tools'AS 'Message', false as 'Success';
-       end if;
-         else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
-			   end if;
-                else
-               SELECT "Total marks should not be negative or null" AS "Message", FALSE AS "Success";
-			   end if;
-               	else
-					SELECT "Section Teacher Course Id not exist" AS "Message", FALSE AS "Success";
-					end if;
-         else
-               SELECT "Tool Name is incorrect" AS "Message", FALSE AS "Success";
-			   end if;
-         else
-               SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
-			   end if;
-      else
-			select 'Batch is not active' AS 'Message',false as 'Success';
-       end if;
-END
 
 
 
@@ -291,51 +463,96 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addAssessmentToolSessionalTheory`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       total_Marks tinyint)
 BEGIN
       
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
       declare isRepeat smallint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
-           
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=0);
+		  set getToolId=getToolId(tool_Name); 
+          set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		 
+         if(getSectionId!=0) then 
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+               
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+              
+                    if (!(getSectionTeacherCourseId is null)) then
+                    
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+                       if(isCourseCompleted=0) then
                     if (!(total_Marks<=0 OR total_Marks is null)) then
-                     set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
+                     set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isSessional(tool_Name)!=0) then
                
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Theory') then
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory') then
+                    
+                    set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+                  
+                    if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    set getSessionalMarks=getSessionalMarks+total_Marks;
+                    else 
+                    set getSessionalMarks= getSessionalMarks+total_Marks;
+                    end if;
+				    set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null)
+                    then set getFinalMarks=0;
+                    end if;
+                    
+                    if(getSessionalMarks<41) then
+                    
 			   
-			set isRepeat=(select sessionalId from assignedtoolclosessional where 
-               toolId=calToolId AND cloId=calCloId AND sectionTeacherCourseId=calSectionTeacherCourseId);
+			set isRepeat=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
 			if(isRepeat is null) then
 				    insert into assignedtoolclosessional
 					values 
 					 (default,
-					 calToolId,
-					 calCloId,
-					 calSectionTeacherCourseId,
-					 total_Marks);
+					 getToolId,
+					 getCloId,
+					 getSectionTeacherCourseId,
+					 total_Marks,
+                     default);
 					   select 'Record has been added successfully' AS 'Message', true as 'Success';
+
+                
+                set getCountOfClo= getTotalCountOfClo(getSectionTeacherCourseId,getCloId);    
+			
+					call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,40,60); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);     
+                       
 				else
                 select 'You have already added this record' AS 'Message', false as 'Success';
                 end if;
+	
+        else
+	  select 'Total Sessional Makrs should not be greater than 40' AS 'Message', false AS 'Success';
+	   end if;
 	   else 
 			select 'You are not teaching pratical for this course' AS 'Message', false as 'Success';
 	   end if;
@@ -343,10 +560,13 @@ BEGIN
           select 'Tool should be from sessional tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			   end if;
                 else
                SELECT "Total marks should not be negative or null" AS "Message", FALSE AS "Success";
+			   end if;
+               else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -357,10 +577,29 @@ BEGIN
          else
                SELECT "Course should be from theory" AS "Message", FALSE AS "Success";
 			   end if;
+		else
+            select 'Section not exist' AS 'Message',false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -375,7 +614,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addFinalMarksObtainedPractical`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       student_Id mediumint,
@@ -384,63 +624,71 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addFinalMarksObtainedPractical`(
 BEGIN
 
 
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
-      declare calFinalId int;
-      declare calTotalMarks tinyint;
-      declare calSectionStudentCourseId int;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getFinalId int;
+      declare getTotalMarks tinyint;
+      declare getSectionStudentCourseId int;
+      declare getSectionId smallint;
       declare isValidRequest int;
       declare shouldUpdateMarks int;
       declare shouldAdd int;
+      declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=1);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
+		set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+          
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
 			 
-             set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    
-                    if (!(calSectionTeacherCourseId is null)) then
-                      set calCloId= isBatchCourseCloValidObtainedMarks
-                     (program_Name,calCourseId,batch_Id,clo_Name,calToolId,calSectionTeacherCourseId);
-                     if(calCloId !=0) then
+             set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+           
+                    if (!(getSectionTeacherCourseId is null)) then
+                      set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                      set getCloId= isBatchCourseValidForUpdate
+                     (program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isPracticalFinal(tool_Name)!=0) then
 	      
-            set calFinalId =(select finalId from assignedtoolclofinal where 
-			sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId);
-            set calTotalMarks=(select totalMarks from assignedtoolclofinal
-            where finalId=calFinalId );
+            set getFinalId =getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+            if(getFinalId is not null) then
             
-            if(marks_Obtained <= calTotalMarks AND marks_Obtained>=0) then 
-             set calSectionStudentCourseId=(select sectionStudentCourseId from 
-             sectionstudentcoursejunction where 
-             sectionId=section_Id AND studentId=student_Id AND courseId=calCourseId);
+            set isToolConducted=isFinalToolConducted(getFinalId);
 			
-            if(!(calSectionStudentCourseId is null)) then 
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Practical') then
+            if(isToolConducted=1) then
             
-            set shouldAdd=(select finalMarksObtainedId from finalmarksobtained 
-			where finalId=calFinalId AND studentId=student_Id);			
-  
-           set isValidRequest=(select finalMarksObtainedId from finalmarksobtained 
-             where finalId=calFinalId AND studentId=student_Id AND marksObtained=marks_Obtained);
+            set getTotalMarks=getFinalTotalMarks(getFinalId);
+            
+            if(marks_Obtained <= getTotalMarks AND marks_Obtained>=0) then 
+             set getSectionStudentCourseId=getSectionStudentCourseId(getSectionId,student_Id,getCourseId);
              
-             set shouldUpdateMarks=(select finalMarksObtainedId from finalmarksobtained 
-             where finalId=calFinalId AND studentId=student_Id AND marksObtained!=marks_Obtained);
+            if(!(getSectionStudentCourseId is null)) then 
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical') then
+            
+            set shouldAdd=shouldAddFinalObtainedMarks(getFinalId,student_Id);
+	
+  
+           set isValidRequest=isValidRequestForFinalObtainedMarks(getFinalId,student_Id,marks_Obtained);
+             
+             set shouldUpdateMarks=shouldUpdateFinalObtainedMarks(getFinalId,student_Id,marks_Obtained);
              
              if(shouldAdd is null) then 
 				insert into finalmarksobtained
 					values 
 					 (default,
-					 calFinalId,
+					 getFinalId,
                       student_Id,
 					 marks_Obtained);
 			select 'Record has been added successfully' AS 'Message', true as 'Success';
@@ -448,7 +696,7 @@ BEGIN
 			elseif(shouldUpdateMarks is not null) then
              update finalmarksobtained 
              set marksObtained=marks_Obtained
-             where finalId=calFinalId AND studentId=student_Id;
+             where finalId=getFinalId AND studentId=student_Id;
               select 'Record has been updated successfully' AS 'Message', true as 'Success';
               
 			elseif(isValidRequest is not null) then
@@ -464,11 +712,20 @@ BEGIN
        else 
           select 'Obtained marks are greater than total marks' AS 'Message', false as 'Success';
        end if;
+        else
+        select 'Tool is not conducted, you cannot enter marks' AS 'Message', false as 'Success';
+       end if;
+        else 
+              select 'Record does not exist' AS 'Message', false As 'Success';
+              end if;
 			else 
           select 'Tool should be from practical final tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+		 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -479,12 +736,20 @@ BEGIN
          else
                SELECT "Course should be from practical" AS "Message", FALSE AS "Success";
 			   end if;
+		else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 
 
 END
+
+
+
+
+
 
 
 
@@ -505,7 +770,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addFinalMarksObtainedTheory`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       student_Id mediumint,
@@ -514,59 +780,70 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addFinalMarksObtainedTheory`(
 BEGIN
 
 
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
-      declare calFinalId int;
-      declare calTotalMarks tinyint;
-      declare calSectionStudentCourseId int;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getFinalId int;
+      declare getTotalMarks tinyint;
+      declare getSectionStudentCourseId int;
+      declare getSectionId smallint;
 	  declare isValidRequest int;
       declare shouldUpdateMarks int;
       declare shouldAdd int;
+      declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
       
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
-           
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-                      set calCloId= isBatchCourseCloValidObtainedMarks
-                     (program_Name,calCourseId,batch_Id,clo_Name,calToolId,calSectionTeacherCourseId);
-                     if(calCloId !=0) then
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=0);
+		  set getToolId=getToolId(tool_Name); 
+          
+          set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+          
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+               
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                      set getCloId= isBatchCourseValidForUpdate
+                     (program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isFinal(tool_Name)!=0) then
-	       set calFinalId =(select finalId from assignedtoolclofinal where 
-			sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId);
-            set calTotalMarks=(select totalMarks from assignedtoolclofinal
-            where finalId=calFinalId );
-            if(marks_Obtained <=calTotalMarks AND marks_Obtained>=0) then 
-             set calSectionStudentCourseId=(select sectionStudentCourseId from 
-             sectionstudentcoursejunction where 
-             sectionId=section_Id AND studentId=student_Id AND courseId=calCourseId);
-			 if(!(calSectionStudentCourseId is null)) then 
-                   
-                   if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Theory') then
-            
-            set shouldAdd=(select finalMarksObtainedId from finalmarksobtained 
-			where finalId=calFinalId AND studentId=student_Id);
-             
-             set shouldUpdateMarks=(select finalMarksObtainedId from finalmarksobtained 
-             where finalId=calFinalId AND studentId=student_Id AND marksObtained!=marks_Obtained);      
-
-			set isValidRequest=(select finalMarksObtainedId from finalmarksobtained 
-             where finalId=calFinalId AND studentId=student_Id AND marksObtained=marks_Obtained);
+	       
+           set getFinalId =getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+		      if(getFinalId is not null) then
+              
+            set isToolConducted=isFinalToolConducted(getFinalId);
 			
+              if(isToolConducted=1) then
+            
+            set getTotalMarks=getFinalTotalMarks(getFinalId);
+            
+            if(marks_Obtained <=getTotalMarks AND marks_Obtained>=0) then 
+             set getSectionStudentCourseId=getSectionStudentCourseId(getSectionId,student_Id,getCourseId);
+
+			 if(!(getSectionStudentCourseId is null)) then 
+                   
+                   if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory') then
+            
+            set shouldAdd=shouldAddFinalObtainedMarks(getFinalId,student_Id);
+             
+             set shouldUpdateMarks=shouldUpdateFinalObtainedMarks(getFinalId,student_Id,marks_Obtained);
+
+			set isValidRequest=isValidRequestForFinalObtainedMarks(getFinalId,student_Id,marks_Obtained);
+       
 			if(shouldAdd is null) then 
 				insert into finalmarksobtained
 					values 
 					 (default,
-					 calFinalId,
+					 getFinalId,
                       student_Id,
 					 marks_Obtained);
 			select 'Record has been added successfully' AS 'Message', true as 'Success';
@@ -574,7 +851,7 @@ BEGIN
 			elseif(shouldUpdateMarks is not null) then
              update finalmarksobtained 
              set marksObtained=marks_Obtained
-             where finalId=calFinalId AND studentId=student_Id;
+             where finalId=getFinalId AND studentId=student_Id;
               select 'Record has been updated successfully' AS 'Message', true as 'Success';
               
 			elseif(isValidRequest is not null) then
@@ -590,11 +867,21 @@ BEGIN
        else 
           select 'Obtained marks are greater than total marks' AS 'Message', false as 'Success';
        end if;
+      
+        else
+        select 'Tool is not conducted, you cannot enter marks' AS 'Message', false as 'Success';
+       end if;
+        else 
+              select 'Record does not exist' AS 'Message', false As 'Success';
+              end if;
 			else 
           select 'Tool should be from final tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+		 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -605,12 +892,22 @@ BEGIN
          else
                SELECT "Course should be from theory" AS "Message", FALSE AS "Success";
 			   end if;
+			else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 
 
 END
+
+
+
+
+
+
+
 
 
 
@@ -635,7 +932,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addSessionalMarksObtainedPractical`
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       student_Id mediumint,
@@ -643,58 +941,67 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addSessionalMarksObtainedPractical`
 )
 BEGIN
 
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
-      declare calSessionalId int;
-      declare calTotalMarks tinyint;
-      declare calSectionStudentCourseId int;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getSessionalId int;
+      declare getTotalMarks tinyint;
+      declare getSectionStudentCourseId int;
+      declare getSectionId smallint;
 	  declare isValidRequest int;
       declare shouldUpdateMarks int;
       declare shouldAdd int;
+      declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=1);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-                      set calCloId= isBatchCourseCloValidObtainedMarks
-                     (program_Name,calCourseId,batch_Id,clo_Name,calToolId,calSectionTeacherCourseId);
-                     if(calCloId !=0) then
+          set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then  
+           
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                    
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                      set getCloId= isBatchCourseValidForUpdate
+                     (program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isPracticalSessional(tool_Name)!=0) then
-	       set calSessionalId=(select sessionalId from assignedtoolclosessional where 
-			sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId);
-            set calTotalMarks=(select totalMarks from assignedtoolclosessional 
-            where sessionalId=calSessionalId);
-            if(marks_Obtained <= calTotalMarks AND marks_Obtained>=0) then 
-             set calSectionStudentCourseId=(select sectionStudentCourseId from 
-             sectionstudentcoursejunction where 
-             sectionId=section_Id AND studentId=student_Id AND courseId=calCourseId);
-			 if(!(calSectionStudentCourseId is null)) then 
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Practical') then
+	       set getSessionalId=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
+           if(getSessionalId is not null) then 
             
-              set shouldAdd=(select sessionalMarksObtainedId from sessionalmarksobtained 
-			where sessionalId=calSessionalId AND studentId=student_Id);
+            set isToolConducted=isSessionalToolConducted(getSessionalId);
+              if(isToolConducted=1) then
             
-			set shouldUpdateMarks=(select sessionalMarksObtainedId from sessionalmarksobtained
-             where sessionalId=calSessionalId AND studentId=student_Id AND marksObtained!=marks_Obtained);
+            set getTotalMarks=getSessionalTotalMarks(getSessionalId);
             
-           set isValidRequest=(select sessionalMarksObtainedId from sessionalmarksobtained 
-             where sessionalId=calSessionalId AND studentId=student_Id AND marksObtained=marks_Obtained);
+            if(marks_Obtained <= getTotalMarks AND marks_Obtained>=0) then 
+             set getSectionStudentCourseId=getSectionStudentCourseId(getSectionId,student_Id,getCourseId);
+	  		  if(!(getSectionStudentCourseId is null)) then 
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical') then
+            
+		set shouldAdd=shouldAddSessionalObtainedMarks(getSessionalId,student_Id);
+            
+	   set shouldUpdateMarks=shouldUpdateSessionalObtainedMarks(getSessionalId,student_Id,marks_Obtained);
+            
+	   set isValidRequest=isValidRequestForSessionalObtainedMarks(getSessionalId,student_Id,marks_Obtained);
+
              
 			if(shouldAdd is null) then 
 				insert into sessionalmarksobtained
 					values 
 					 (default,
-					 calSessionalId,
+					 getSessionalId,
                       student_Id,
 					 marks_Obtained);
 			select 'Record has been added successfully' AS 'Message', true as 'Success';
@@ -702,7 +1009,7 @@ BEGIN
 			elseif(shouldUpdateMarks is not null) then
              update sessionalmarksobtained 
              set marksObtained=marks_Obtained
-             where sessionalId=calSessionalId AND studentId=student_Id;
+             where sessionalId=getSessionalId AND studentId=student_Id;
               select 'Record has been updated successfully' AS 'Message', true as 'Success';
               
 			elseif(isValidRequest is not null) then
@@ -719,11 +1026,20 @@ BEGIN
        else 
           select 'Obtained marks are greater than total marks' AS 'Message', false as 'Success';
        end if;
+        else
+        select 'Tool is not conducted, you cannot enter marks' AS 'Message', false as 'Success';
+       end if;
+        else 
+              select 'Record does not exist' AS 'Message', false As 'Success';
+              end if;
 			else 
           select 'Tool should be from practical sessional tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+			 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -734,12 +1050,31 @@ BEGIN
          else
                SELECT "Course should be from practical" AS "Message", FALSE AS "Success";
 			   end if;
+			else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 
 
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -759,7 +1094,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addSessionalMarksObtainedTheory`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6),
       student_Id mediumint,
@@ -767,59 +1103,68 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addSessionalMarksObtainedTheory`(
 )
 BEGIN
 
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
-      declare calSessionalId int;
-      declare calTotalMarks tinyint;
-      declare calSectionStudentCourseId int;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getSessionalId int;
+      declare getTotalMarks tinyint;
+      declare getSectionStudentCourseId int;
+      declare getSectionId smallint;
 	  declare isValidRequest int;
       declare shouldUpdateMarks int;
       declare shouldAdd int;
+      declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=0);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-	                 set calCloId= isBatchCourseCloValidObtainedMarks
-                     (program_Name,calCourseId,batch_Id,clo_Name,calToolId,calSectionTeacherCourseId);
-                     if(calCloId !=0) then
+		set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+        
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                    
+	                 set getCloId= isBatchCourseValidForUpdate
+                     (program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isSessional(tool_Name)!=0) then
-	       set calSessionalId=(select sessionalId from assignedtoolclosessional where 
-			sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId);
+	       set getSessionalId=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
             
-            set calTotalMarks=(select totalMarks from assignedtoolclosessional 
-            where sessionalId=calSessionalId);
-            if(marks_Obtained<=calTotalMarks AND marks_Obtained>=0) then 
-             set calSectionStudentCourseId=(select sectionStudentCourseId from 
-             sectionstudentcoursejunction where 
-             sectionId=section_Id AND studentId=student_Id AND courseId=calCourseId);
-			 if(!(calSectionStudentCourseId is null)) then 
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Theory') then
+            if(!(getSessionalId is null)) then
+            
+            set isToolConducted=isSessionalToolConducted(getSessionalId);
+            if(isToolConducted=1) then
+            
+            set getTotalMarks=getSessionalTotalMarks(getSessionalId);
+           
+            if(marks_Obtained<=getTotalMarks AND marks_Obtained>=0) then 
+             set getSectionStudentCourseId=getSectionStudentCourseId(getSectionId,student_Id,getCourseId);
+			 if(!(getSectionStudentCourseId is null)) then 
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory') then
 
-            set shouldAdd=(select sessionalMarksObtainedId from sessionalmarksobtained 
-			where sessionalId=calSessionalId AND studentId=student_Id);
+            set shouldAdd=shouldAddSessionalObtainedMarks(getSessionalId,student_Id);
             
-			set shouldUpdateMarks=(select sessionalMarksObtainedId from sessionalmarksobtained
-             where sessionalId=calSessionalId AND studentId=student_Id AND marksObtained!=marks_Obtained);
+			set shouldUpdateMarks=shouldUpdateSessionalObtainedMarks(getSessionalId,student_Id,marks_Obtained);
             
-            set isValidRequest=(select sessionalMarksObtainedId from sessionalmarksobtained 
-             where sessionalId=calSessionalId AND studentId=student_Id AND marksObtained=marks_Obtained);
+            set isValidRequest=isValidRequestForSessionalObtainedMarks(getSessionalId,student_Id,marks_Obtained);
+  
              
 			if(shouldAdd is null) then 
 				insert into sessionalmarksobtained
 					values 
 					 (default,
-					 calSessionalId,
+					 getSessionalId,
                       student_Id,
 					 marks_Obtained);
 			select 'Record has been added successfully' AS 'Message', true as 'Success';
@@ -827,7 +1172,7 @@ BEGIN
 			elseif(shouldUpdateMarks is not null) then
              update sessionalmarksobtained 
              set marksObtained=marks_Obtained
-             where sessionalId=calSessionalId AND studentId=student_Id;
+             where sessionalId=getSessionalId AND studentId=student_Id;
               select 'Record has been updated successfully' AS 'Message', true as 'Success';
               
 			elseif(isValidRequest is not null) then
@@ -843,11 +1188,20 @@ BEGIN
        else 
           select 'Obtained marks are greater than total marks' AS 'Message', false as 'Success';
        end if;
+       else
+        select 'Tool is not conducted, you cannot enter marks' AS 'Message', false as 'Success';
+       end if;
+       else
+       select 'Tool does not exist for this CLO' AS 'Message',false as 'Success';
+       end if;
 			else 
           select 'Tool should be from sessional tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+		 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -858,10 +1212,93 @@ BEGIN
          else
                SELECT "Course should be from theory" AS "Message", FALSE AS "Success";
 			   end if;
+			else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `assignedCloMarksMetaData`(
+getCountOfClo smallint,
+getSectionTeacherCourseId int,
+getCloId smallint
+)
+BEGIN
+	update assignedmarksmetadata
+	set 
+		assessmentCountOfClo=getCountOfClo
+		where 
+		sectionTeacherCourseId=getSectionTeacherCourseId AND cloId=getCloId;
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `assignedMarksMetaData`(
+getSessionalMarks smallint,
+getFinalMarks smallint,
+getSectionTeacherCourseId int,
+getRequiredSumOfSessionalMarks smallint,
+getRequiredSumOfFinalMarks smallint
+)
+BEGIN
+	update assignedmarksmetadata
+	set 
+		sumOfSessionalMarks=getSessionalMarks,
+		sumOfFinalMarks=getFinalMarks,
+        requiredSessionalMarks=getRequiredSumOfSessionalMarks,
+        requiredFinalMarks=getRequiredSumOfFinalMarks
+        
+		where 
+		sectionTeacherCourseId=getSectionTeacherCourseId;
+END
+
+
+
 
 
 
@@ -882,45 +1319,93 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteAssessmentToolFinalPractical`
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6)
 )
 BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getTotalMarks smallint;
+      declare getFinalId smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=1);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-				set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
+          set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then  
+           
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                     set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+				set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isPracticalFinal(tool_Name)!=0) then
                
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Practical') then
-                       if((select finalId from assignedtoolclofinal where 
-                        sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId)!=0)
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical') then
+                      
+                      
+                set getFinalId=getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+						
+                      if(!(getFinalId is null))
                         then 
+                     
+                    set getTotalMarks=getFinalTotalMarks(getFinalId);
+                        
+             set getSessionalMarks=(select sum(totalMarks) from assignedtoolclosessional
+					where sectionTeacherCourseId=getSectionTeacherCourseId);
+                  
+                  if(getSessionalMarks is null) then
+                     set getSessionalMarks=0;
+                     end if;
+                  
+				set getFinalMarks=(select sum(totalMarks)-getTotalMarks from assignedtoolclofinal
+					where sectionTeacherCourseId=getSectionTeacherCourseId);
+				
+                
+                
+                    if(getFinalMarks<31) then
+			
 					   delete from assignedtoolclofinal
 					   where (
-					   sectionTeacherCourseId=calSectionTeacherCourseId
-					   ANd toolId=calToolId AND cloId=calCloId);
+					   sectionTeacherCourseId=getSectionTeacherCourseId
+					   ANd toolId=getToolId AND cloId=getCloId);
 					   select 'Assessment tool of final deleted successfully' 
                        AS 'Message', true as 'Success';
-	else 
+                
+                set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+					call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,20,30); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
+	
+     else
+	select 'Total Final Makrs should not be greater than 30' AS 'Message', false AS 'Success';
+	end if;
+    
+    else 
       select 'Record does not exists' AS 'Message', false as 'Success';
 	end if;
+    
 	 else 
 			select 'You are not teaching practical for this course' AS 'Message', false as 'Success';
 	   end if;
@@ -928,7 +1413,10 @@ BEGIN
           select 'Tool should be from final practical tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+		 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -939,10 +1427,20 @@ BEGIN
          else
                SELECT "Course should be from practical" AS "Message", FALSE AS "Success";
 			   end if;
+		else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
 END
+
+
+
+
+
+
+
 
 
 
@@ -963,45 +1461,94 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteAssessmentToolFinalTheory`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6)
 )
 BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getTotalMarks smallint;
+      declare getFinalId smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=0);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-				set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
+        set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then    
+		
+		  if (!(getCourseId is null)) then
+          
+			   if (!(getToolId is null)) then
+               
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                    
+                    set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+				set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isFinal(tool_Name)!=0) then
                
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Theory') then
-                       if((select finalId from assignedtoolclofinal where 
-                        sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId)!=0)
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory') then
+                      
+                    
+                    set getFinalId=getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+                      
+                      if(!(getFinalId is null))
                         then 
+                     
+                    set getTotalMarks=getFinalTotalMarks(getFinalId);
+                    
+                   set getSessionalMarks=(select sum(totalMarks) from assignedtoolclosessional
+					where sectionTeacherCourseId=getSectionTeacherCourseId);
+                    
+                    if(getSessionalMarks is null) then
+                     set getSessionalMarks=0;
+                     end if;
+                    
+				    set getFinalMarks=(select sum(totalMarks)-getTotalMarks from assignedtoolclofinal
+					where sectionTeacherCourseId=getSectionTeacherCourseId);   
+			
+                    if(getFinalMarks<61) then
+			
 					   delete from assignedtoolclofinal
 					   where (
-					   sectionTeacherCourseId=calSectionTeacherCourseId
-					   ANd toolId=calToolId AND cloId=calCloId);
+					   sectionTeacherCourseId=getSectionTeacherCourseId
+					   ANd toolId=getToolId AND cloId=getCloId);
 					   select 'Assessment tool of final deleted successfully' 
                        AS 'Message', true as 'Success';
-	else 
+                
+                set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+					call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,40,60); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
+	
+      else
+	select 'Total Final Makrs should not be greater than 60' AS 'Message', false AS 'Success';
+	end if;
+    
+    else 
       select 'Record does not exists' AS 'Message', false as 'Success';
 	end if;
+    
 	 else 
 			select 'You are not teaching theory for this course' AS 'Message', false as 'Success';
 	   end if;
@@ -1009,7 +1556,10 @@ BEGIN
           select 'Tool should be from final tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+                else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -1020,6 +1570,9 @@ BEGIN
          else
                SELECT "Course should be from theory" AS "Message", FALSE AS "Success";
 			   end if;
+               else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;
@@ -1038,50 +1591,109 @@ END
 
 
 
+
+
+
+
+
+
+
+
+
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteAssessmentToolSessionalPractical`(
       program_Name varchar(50),
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6)
 )
 BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+	  declare isCourseCompleted tinyint;
+      declare getTotalMarks smallint;
+      declare getSessionalId smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
 
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=1);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-				set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
+          set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then  
+           
+		  if (!(getCourseId is null)) then
+          
+			   if (!(getToolId is null)) then
+               
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+                    if (!(getSectionTeacherCourseId is null)) then
+                    
+                   set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                       
+				set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isPracticalSessional(tool_Name)!=0) then
                
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Practical') then
-                       if((select sessionalId from assignedtoolclosessional where 
-                        sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId)!=0)
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical') then
+                       
+                   set getSessionalId=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);    
+                      
+                      if(!(getSessionalId is null))
                         then 
+                       
+                set getTotalMarks=getSessionalTotalMarks(getSessionalId);
+                
+					 set getSessionalMarks=(select sum(totalMarks)-getTotalMarks from assignedtoolclosessional
+					where sectionTeacherCourseId=getSectionTeacherCourseId);
+                    
+				   set getFinalMarks=(select sum(totalMarks) from assignedtoolclofinal
+					where sectionTeacherCourseId=getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                     end if;
+                    
+				 if(getSessionalMarks<21) then
+                    
 					   delete from assignedtoolclosessional 
 					   where (
-					   sectionTeacherCourseId=calSectionTeacherCourseId
-					   ANd toolId=calToolId AND cloId=calCloId);
+					   sectionTeacherCourseId=getSectionTeacherCourseId
+					   ANd toolId=getToolId AND cloId=getCloId);
 					   select 'Assessment tool of sessional deleted successfully' 
                        AS 'Message', true as 'Success';
+		
+                  set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+				    call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,20,30); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
+   
+    else
+	select 'Total Sessional Makrs should not be greater than 20' AS 'Message', false AS 'Success';
+	end if;
+        
 	else 
       select 'Record does not exists' AS 'Message', false as 'Success';
 	end if;
+    
 	 else 
 			select 'You are not teaching pratical for this course' AS 'Message', false as 'Success';
 	   end if;
@@ -1089,7 +1701,10 @@ BEGIN
           select 'Tool should be from practical sessional tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+		 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -1100,6 +1715,9 @@ BEGIN
          else
                SELECT "Course should be from practical" AS "Message", FALSE AS "Success";
 			   end if;
+		else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;	
@@ -1122,50 +1740,104 @@ END
 
 
 
+
+
+
+
+
+
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteAssessmentToolSessionalTheory`(
       program_Name varchar(50),
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name varchar(20),
 	  clo_Name char(6)
 )
 BEGIN
-      declare calCourseId smallint;
-      declare calToolId smallint;
-      declare calSectionTeacherCourseId int;
-      declare calCloId mediumint;
-
+      declare getCourseId smallint;
+      declare getToolId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getCloId mediumint;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare getTotalMarks smallint;
+      declare getSessionalId smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
+      
 	  if(select batchId from batch 
       where (batchId=batch_Id and isCurrent=1)) then
       
-          set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		  set calToolId=(Select toolId from assessmenttools where toolName=tool_Name); 
+          set getCourseId=(select courseId from course where courseName=course_Name 
+          and courseCode=course_Code and isPractical=0);
+		  set getToolId=getToolId(tool_Name); 
            
-		  if (!(calCourseId is null)) then
-			   if (!(calToolId is null)) then
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			  where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));
-                    if (!(calSectionTeacherCourseId is null)) then
-				set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
+           set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+           
+		  if (!(getCourseId is null)) then
+			   if (!(getToolId is null)) then
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+             
+                    if (!(getSectionTeacherCourseId is null)) then
+                      set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+				set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
                       if(isSessional(tool_Name)!=0) then
                
-                    if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' 
-                    OR isTeacherValid(teacher_Id,section_Id,course_Name)='Theory') then
-                       if((select sessionalId from assignedtoolclosessional where 
-                        sectionTeacherCourseId=calSectionTeacherCourseId ANd toolId=calToolId AND cloId=calCloId)!=0)
+                    if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' 
+                    OR isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory') then
+                      
+                set getSessionalId=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
+		
+                      if(!(getSessionalId is null))
                         then 
+                     
+				set getTotalMarks=getSessionalTotalMarks(getSessionalId);
+             
+				 
+                 set getSessionalMarks=(select sum(totalMarks)-getTotalMarks from assignedtoolclosessional
+					where sectionTeacherCourseId=getSectionTeacherCourseId);
+                    
+				set getFinalMarks=(select sum(totalMarks) from assignedtoolclofinal
+					where sectionTeacherCourseId=getSectionTeacherCourseId);	
+				if(getFinalMarks is null) then
+                set getFinalMarks=0;
+                end if;
+				 
+                 if(getSessionalMarks<41) then
+                    
 					   delete from assignedtoolclosessional 
 					   where (
-					   sectionTeacherCourseId=calSectionTeacherCourseId
-					   ANd toolId=calToolId AND cloId=calCloId);
+					   sectionTeacherCourseId=getSectionTeacherCourseId
+					   ANd toolId=getToolId AND cloId=getCloId);
 					   select 'Assessment tool of sessional deleted successfully' 
                        AS 'Message', true as 'Success';
+                
+                set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+				
+					call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,40,60); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,getCloId);
+   
+   
+   else
+	select 'Total Sessional Makrs should not be greater than 40' AS 'Message', false AS 'Success';
+	end if;
 	else 
       select 'Record does not exists' AS 'Message', false as 'Success';
 	end if;
+    
+     
 	 else 
 			select 'You are not teaching pratical for this course' AS 'Message', false as 'Success';
 	   end if;
@@ -1173,7 +1845,10 @@ BEGIN
           select 'Tool should be from sessional tools'AS 'Message', false as 'Success';
        end if;
          else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
+			   end if;
+		 else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
 			   end if;
                	else
 					SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
@@ -1184,10 +1859,187 @@ BEGIN
          else
                SELECT "Course should be from theory" AS "Message", FALSE AS "Success";
 			   end if;
+		else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
       else
 			select 'Batch is not active' AS 'Message',false as 'Success';
        end if;			 
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setIsConductedValueForFinal`(
+program_Name varchar(50),
+batch_Id smallint,
+section_Name char(2),
+tool_Name varchar(20),
+teacher_Id smallint,
+course_Name varchar(20),
+course_Code char(8),
+is_Practical tinyint
+)
+BEGIN
+  declare getSectionId smallint;
+  declare getToolId tinyint;
+  declare getCourseId smallint;
+  declare getSectionTeacherCourseId int;
+
+
+  set getSectionId=getSection(program_Name,batch_Id,section_Name);
+  if(getSectionId is not null) then
+   set getToolId=getToolId(tool_Name);
+   if(getToolId is not null) then
+     
+    set getCourseId=(select courseId from course where 
+    courseName=course_Name AND courseCode=course_Code AND isPractical=is_Practical);
+   
+      if(getCourseId is not null) then
+       
+       set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+ 
+       if(getSectionTeacherCourseId is not null) then
+       
+			  create temporary table temporaryfinaltable(finalId smallint);
+			  insert into temporaryfinaltable(finalId)
+			  select finalId from assignedtoolclofinal where
+			  toolId=getToolId  AND sectionTeacherCourseId=getSectionTeacherCourseId;
+  
+			  update assignedtoolclofinal
+			  set isConducted=1 where
+			  finalId IN (select finalId from temporaryfinaltable);
+			  drop temporary table temporaryfinaltable;
+              
+              select 'Record has been updated successfully' AS 'Message',false AS 'Success';
+	
+    else
+    select 'You are not teaching this course to this section' AS 'Messgae',false as 'Success';
+    end if;
+    else
+    select 'Invalid course' AS 'Messgae',false as 'Success';
+    end if;
+
+    else
+    select 'Tool Name is incorrect' AS 'Messgae',false as 'Success';
+    end if;
+    else
+    select 'Invalid section' AS 'Messgae',false as 'Success';
+    end if;
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setIsConductedValueForSessional`(
+program_Name varchar(50),
+batch_Id smallint,
+section_Name char(2),
+tool_Name varchar(20),
+teacher_Id smallint,
+course_Name varchar(20),
+course_Code char(8),
+is_Practical tinyint
+)
+BEGIN
+  declare getSectionId smallint;
+  declare getToolId tinyint;
+  declare getCourseId smallint;
+  declare getSectionTeacherCourseId int;
+
+  
+
+  set getSectionId=getSection(program_Name,batch_Id,section_Name);
+  if(getSectionId is not null) then
+   set getToolId=getToolId(tool_Name);
+    if(getToolId is not null) then
+     set getCourseId=(select courseId from course where 
+	 courseName=course_Name AND courseCode=course_Code AND isPractical=is_Practical);
+       if(getCourseId is not null) then
+ 
+         set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);
+    
+            if(getSectionTeacherCourseId is not null) then
+  
+			  create temporary table temporarysessionaltable(sessionalId smallint);
+			  insert into temporarysessionaltable(sessionalId)
+			  select sessionalId from assignedtoolclosessional where
+			  toolId=getToolId  AND sectionTeacherCourseId=getSectionTeacherCourseId;
+  
+				  update assignedtoolclosessional
+				  set isConducted=1 where
+				  sessionalId IN (select sessionalId from temporarysessionaltable);
+				  
+				  drop temporary table temporarysessionaltable;
+			
+            select 'Record has been updated successfully' AS 'Message',false AS 'Success';
+	else
+    select 'You are not teaching this course to this section' AS 'Messgae',false as 'Success';
+    end if;
+    else
+    select 'Invalid course' AS 'Messgae',false as 'Success';
+    end if;
+    else
+    select 'Tool Name is incorrect' AS 'Messgae',false as 'Success';
+    end if;
+    else
+    select 'Invalid section' AS 'Messgae',false as 'Success';
+    end if;
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1208,7 +2060,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolFinalPractical`
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name  varchar(20),
       new_Tool_Name varchar(20),
       clo_Name char(6),
@@ -1216,62 +2069,141 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolFinalPractical`
       total_Marks tinyint
 )
 BEGIN
-      declare calCourseId smallint;
-	  declare calToolId smallint;
-      declare matchToolId smallint;
-      declare newCalToolId smallint;
-      declare calCloId mediumint;
-      declare newCalCloId smallint;
-      declare calSectionTeacherCourseId int;
+      declare getCourseId smallint;
+	  declare getToolId smallint;
+      declare newGetToolId smallint;
+      declare getCloId mediumint;
+      declare newGetCloId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare getPreviousCountOfClo smallint;
+      declare getPreviousSessionalCountOfClo smallint;
+      declare getPreviousFinalCountOfClo smallint;
+	  declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
+      declare shouldUpdate smallint;
+      declare getFinalId smallint;
+      declare getTotalMarks smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
       
 	 if(select batchId from batch 
 	 where (batchId=batch_Id and isCurrent=1)) then
 		 
-         set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		 set calToolId=(Select toolId from assessmenttools where toolName=tool_Name);
-		 set newCalToolId=(select toolId from assessmenttools where toolName=new_Tool_Name);
+         set getCourseId=(select courseId from course where courseName=course_Name 
+         and courseCode=course_Code and isPractical=1);
+		 set getToolId=getToolId(tool_Name);
+		 set newGetToolId=getToolId(new_Tool_Name);
 	
-          if (!(calCourseId is null)) then
+        set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+    
+          if (!(getCourseId is null)) then
 		      
-              if (!(calToolId is null))then 
+              if (!(getToolId is null))then 
         
-		         if (!(newCalToolId is null))then 
+		         if (!(newGetToolId is null))then 
 			
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			 where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));  
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);  
              
-		      if (!(calSectionTeacherCourseId is null)) then 
-						
+		      if (!(getSectionTeacherCourseId is null)) then 
+					
+                    set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
                         
 		          if (!(total_Marks<=0 OR total_Marks is null)) then
-				set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
-                     set matchToolId=(select finalId from assignedtoolclofinal 
-                         where toolId=calToolId AND sectionTeacherCourseId=calSectionTeacherCourseId
-                         AND cloId=calCloId);
-						 if(!(matchToolId is null)) then 
-					set newCalCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,new_Clo_Name);
-                     if(newCalCloId !=0) then	
+				set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     if(getCloId !=0) then
+                     
+                     
+                   set getFinalId=getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+
+                        	 if(!(getFinalId is null)) then 
+                        
+					set getTotalMarks=getFinalTotalMarks(getFinalId);
+                         
+                         set isToolConducted=isFinalToolConducted(getFinalId);
+						if(isToolConducted=0) then
+                         
+					set newGetCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,new_Clo_Name);
+                     if(newGetCloId !=0) then	
 	              	if(isPracticalFinal(tool_Name)!=0) then
                       if(isPracticalFinal(new_Tool_Name)!=0) then
 					
-                      if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' OR
-                          isTeacherValid(teacher_Id,section_Id,course_Name)='Practical')
+                      if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' OR
+                          isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical')
 					  then 
-					   update assignedtoolclofinal
+					   
+                  set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+                  
+                   if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    end if;
+                   
+				set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                    set getFinalMarks=getFinalMarks+total_Marks;
+                    else 
+                    set getFinalMarks= getFinalMarks+total_Marks-getTotalMarks;
+                    end if;
+				
+                if(getFinalMarks<31) then
+
+
+                     set shouldUpdate=getFinalId(newGetToolId,newGetCloId,getSectionTeacherCourseId);
+
+					   if(shouldUpdate is null OR shouldUpdate=getFinalId) then
+                       update assignedtoolclofinal
 					   set 
-							toolId=newCalToolId,
-							cloId=newCalCloId,
+							toolId=newGetToolId,
+							cloId=newGetCloId,
 							totalMarks=total_Marks
 					   where(
-							sectionTeacherCourseId=calSectionTeacherCourseId
+							sectionTeacherCourseId=getSectionTeacherCourseId
 								ANd 
-							toolId=calToolId);
+							toolId=getToolId
+                            AND cloId=getCloId);
 				      select 'Record has been upated successfully' AS 'Message', true as 'Success';
+                      
+                   set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,newGetCloId);
+                    
+				   set getPreviousCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+                    
+				 call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,20,30); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,newGetCloId);      
+		
+		
+                    update assignedmarksmetadata
+                      set 
+                     sumOfSessionalMarks=getSessionalMarks,
+                     sumOfFinalMarks=getFinalMarks,
+                     assessmentCountOfClo=getPreviousCountOfClo
+                     where 
+                     sectionTeacherCourseId=getSectionTeacherCourseId AND cloId=getCloId;
+    
+    
+    else
+	select 'Record already exist' AS 'Message', false AS 'Success';
+	end if; 
+    
+    
+     else
+	select 'Total Final Makrs should not be greater than 30' AS 'Message', false AS 'Success';
+	end if;
 		          else 
                   select 'You can only update assessment tool for practical/ section you are teaching' 
                   AS 'Message', false as 'Success';
                   end if;
+                  
+		
 			   else 
 			    select 'New Tool should be from Practical Final Tools' AS 'Message', false as 'Success';
 	            end if;
@@ -1281,17 +2213,23 @@ BEGIN
                else
           select 'New CLO Name is not valid' AS 'Message', false as 'Success';
           end if;
+          
+          else
+              select 'Tool has been conducted so can not update it' AS 'Message', false as 'Success';
+              end if;
 			else
 		  SELECT "Tool name is not found so can not update it " AS "Message", FALSE AS "Success";
 		  end if;
          
 			else
-			SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+			SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			end if;
             else
             SELECT "Total marks can not be negative" AS "Message", FALSE AS "Success";
 			end if; 
-	
+	      else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
+			   end if;
 		 else
 		 SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
 		 end if;
@@ -1304,10 +2242,28 @@ BEGIN
 	 else
      SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
 	 end if;
+     
+	else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
 	else
 	select 'Batch is not active' AS 'Message',false as 'Success';
 	end if;
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1324,7 +2280,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolFinalTheory`(
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name  varchar(20),
       new_Tool_Name varchar(20),
       clo_Name char(6),
@@ -1332,62 +2289,144 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolFinalTheory`(
       total_Marks tinyint
 )
 BEGIN
-	  declare calCourseId smallint;
-	  declare calToolId smallint;
-      declare matchToolId smallint;
-      declare newCalToolId smallint;
-      declare calCloId mediumint;
-      declare newCalCloId mediumint;
-      declare calSectionTeacherCourseId int;
+	  declare getCourseId smallint;
+	  declare getToolId smallint;
+      declare newGetToolId smallint;
+      declare getCloId mediumint;
+      declare newGetCloId mediumint;
+      declare getSectionTeacherCourseId int;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare getPreviousCountOfClo smallint;
+      declare getPreviousSessionalCountOfClo smallint;
+      declare getPreviousFinalCountOfClo smallint;
+	  declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
+      declare shouldUpdate smallint;
+      declare getFinalId smallint;
+      declare getTotalMarks smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
       
 	 if(select batchId from batch 
 	 where (batchId=batch_Id and isCurrent=1)) then
 		 
-         set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		 set calToolId=(Select toolId from assessmenttools where toolName=tool_Name);
-		 set newCalToolId=(select toolId from assessmenttools where toolName=new_Tool_Name);
+         set getCourseId=(select courseId from course where courseName=course_Name 
+         and courseCode=course_Code and isPractical=0);
+		 set getToolId=getToolId(tool_Name);
+		 set newGetToolId=getToolId(new_Tool_Name);
 	
-          if (!(calCourseId is null)) then
+         set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+    
+          if (!(getCourseId is null)) then
 		      
-              if (!(calToolId is null))then 
+              if (!(getToolId is null))then 
         
-		         if (!(newCalToolId is null))then 
+		         if (!(newGetToolId is null))then 
 			
 			
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			 where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));  
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);  
              
-		      if (!(calSectionTeacherCourseId is null)) then 
-						 
+		      if (!(getSectionTeacherCourseId is null)) then 
+						
+					set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                       
 		          if (!(total_Marks<=0 OR total_Marks is null)) then
-			        set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                     if(calCloId !=0) then
-                     set matchToolId=(select finalId from assignedtoolclofinal
-                         where toolId=calToolId AND cloId=calCloId AND sectionTeacherCourseId=calSectionTeacherCourseId
-                         AND cloId=calCloId);
-                         if(!(matchToolId is null)) then
-					set newCalCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,new_Clo_Name);
-                     if(newCalCloId !=0) then
+			        set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                     
+                     if(getCloId !=0) then
+                    
+                    
+                     set getFinalId=getFinalId(getToolId,getCloId,getSectionTeacherCourseId);
+                        
+                        if(!(getFinalId is null)) then
+						
+                        
+					set getTotalMarks=getFinalTotalMarks(getFinalId);
+                    
+                    set isToolConducted=isFinalToolConducted(getFinalId);
+						if(isToolConducted=0) then
+                    
+                    set newGetCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,new_Clo_Name);
+                     if(newGetCloId !=0) then
 	              	if(isFinal(tool_Name)!=0) then
                       if(isFinal(new_Tool_Name)!=0) then
 					
-                      if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' OR
-                          isTeacherValid(teacher_Id,section_Id,course_Name)='Theory')
+                      if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' OR
+                          isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory')
 					  then 
-					   update assignedtoolclofinal
+					   
+					set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+				
+                    if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    end if;
+                    
+				set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                    set getFinalMarks=getFinalMarks+total_Marks;
+                    else 
+                    set getFinalMarks= getFinalMarks+total_Marks-getTotalMarks;
+                    end if;
+					
+                    
+                    if(getFinalMarks<61) then
+                       
+                       
+					set shouldUpdate=getFinalId(newGetToolId,newGetCloId,getSectionTeacherCourseId);
+                       
+                       if(shouldUpdate is null OR shouldUpdate=getFinalId) then
+                       update assignedtoolclofinal
 					   set 
-							toolId=newCalToolId,
-							cloId=newCalCloId,
+							toolId=newGetToolId,
+							cloId=newGetCloId,
 							totalMarks=total_Marks
 					   where(
-							sectionTeacherCourseId=calSectionTeacherCourseId
+							sectionTeacherCourseId=getSectionTeacherCourseId
 								ANd 
-							toolId=calToolId);
+							toolId=getToolId
+                            AND cloId=getCloId);
 				      select 'Record has been upated successfully' AS 'Message', true as 'Success';
+                      
+		
+                    set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,newGetCloId);
+                    
+				   set getPreviousCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+        
+                   call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,40,60); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,newGetCloId);
+                    
+                    
+                    update assignedmarksmetadata
+                      set 
+                     sumOfSessionalMarks=getSessionalMarks,
+                     sumOfFinalMarks=getFinalMarks,
+                     assessmentCountOfClo=getPreviousCountOfClo
+                     where 
+                     sectionTeacherCourseId=getSectionTeacherCourseId AND cloId=getCloId;
+               
+		else
+	select 'Record already exist' AS 'Message', false AS 'Success';
+	end if; 
+     
+      else
+	select 'Total Final Makrs should not be greater than 60' AS 'Message', false AS 'Success';
+	end if;
+               
 		          else 
                   select 'You can only add assessment tool for theory/ section you are teaching' 
                   AS 'Message', false as 'Success';
                   end if;
+                  
+			
 			   else 
 			    select 'New Tool should be from Final Tools' AS 'Message', false as 'Success';
 	            end if;
@@ -1397,16 +2436,22 @@ BEGIN
               else
               select 'New CLO not valid' AS 'Message', false as 'Success';
               end if;
+              
+              else
+              select 'Tool has been conducted so can not update it' AS 'Message', false as 'Success';
+              end if;
                else
 		  SELECT "Tool name is not found so can not update it " AS "Message", FALSE AS "Success";
 		  end if;
 			  else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			   end if;
             else
             SELECT "Total marks can not be negative" AS "Message", FALSE AS "Success";
 			end if; 
-		 
+		   else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
+			   end if;
 		 else
 		 SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
 		 end if;
@@ -1419,10 +2464,29 @@ BEGIN
 	 else
      SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
 	 end if;
+     else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
 	else
 	select 'Batch is not active' AS 'Message',false as 'Success';
 	end if;
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1439,7 +2503,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolSessionalPracti
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name  varchar(20),
       new_Tool_Name varchar(20),
       clo_Name char(6),
@@ -1447,63 +2512,138 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolSessionalPracti
       total_Marks tinyint
 )
 BEGIN
-      declare calCourseId smallint;
-	  declare calToolId smallint;
-      declare matchToolId smallint;
-      declare newCalToolId smallint;
-      declare calCloId mediumint;
-      declare newCalCloId smallint;
-      declare calSectionTeacherCourseId int;
+      declare getCourseId smallint;
+	  declare getToolId smallint;
+      declare newGetToolId smallint;
+      declare getCloId mediumint;
+      declare newGetCloId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare getPreviousCountOfClo smallint;
+      declare getPreviousSessionalCountOfClo smallint;
+      declare getPreviousFinalCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
+      declare shouldUpdate smallint;
+      declare getSessionalId smallint;
+      declare getTotalMarks smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
       
 	 if(select batchId from batch 
 	 where (batchId=batch_Id and isCurrent=1)) then
 		 
-         set calCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
-		 set calToolId=(Select toolId from assessmenttools where toolName=tool_Name);
-		 set newCalToolId=(select toolId from assessmenttools where toolName=new_Tool_Name);
+         set getCourseId=(select courseId from course where courseName=course_Name 
+         and courseCode=course_Code and isPractical=1);
+		 set getToolId=getToolId(tool_Name);
+		 set newGetToolId=getToolId(new_Tool_Name);
 
-	
-          if (!(calCourseId is null)) then
+	   set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+          
+          if (!(getCourseId is null)) then
 		      
-              if (!(calToolId is null))then 
+              if (!(getToolId is null))then 
         
-		         if (!(newCalToolId is null))then 
+		         if (!(newGetToolId is null))then 
 			
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			 where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));  
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);  
              
-		      if (!(calSectionTeacherCourseId is null)) then 
-			
+		      if (!(getSectionTeacherCourseId is null)) then 
+			         set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                       
 		          if (!(total_Marks<=0 OR total_Marks is null)) then
-			       set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
-                    if(calCloId !=0) then
-						set matchToolId=(select sessionalId from assignedtoolclosessional 
-                         where toolId=calToolId AND sectionTeacherCourseId=calSectionTeacherCourseId
-                         AND cloId=calCloId);
-                         if(!(matchToolId is null)) then 
-                    set newCalCloId=isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,new_Clo_Name);
-                     if(newCalCloId !=0) then
+			       set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
+                    if(getCloId !=0) then
+                    
+                      set getSessionalId=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
+
+					   set getTotalMarks=getSessionalTotalMarks(getSessionalId);
+                    
+                         if(!(getSessionalId is null)) then 
+                         
+                          set isToolConducted=isSessionalToolConducted(getSessionalId);
+						if(isToolConducted=0) then
+                         
+                    set newGetCloId=isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,new_Clo_Name);
+                     if(newGetCloId !=0) then
                      
 	              	if(isPracticalSessional(tool_Name)!=0) then
                       if(isPracticalSessional(new_Tool_Name)!=0) then
 					
-                      if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' OR
-                          isTeacherValid(teacher_Id,section_Id,course_Name)='Practical')
+                      if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' OR
+                          isTeacherValid(teacher_Id,getSectionId,course_Name)='Practical')
 					  then 
-					   update assignedtoolclosessional 
+					   
+					set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+                    
+                    if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    set getSessionalMarks=getSessionalMarks+total_Marks;
+                    else 
+                    set getSessionalMarks= getSessionalMarks+total_Marks-getTotalMarks;
+                    end if;
+                    
+				    set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                      
+					if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                    end if;
+                       
+				    if(getSessionalMarks<21) then
+                       
+                       set shouldUpdate=getSessionalId(newGetToolId,newGetCloId,getSectionTeacherCourseId);
+                     
+                     if(shouldUpdate is null OR shouldUpdate=getSessionalId) then
+                     
+                     update assignedtoolclosessional 
 					   set 
-							toolId=newCalToolId,
-							cloId=newCalCloId,
+							toolId=newGetToolId,
+							cloId=newGetCloId,
 							totalMarks=total_Marks
 					   where(
-							sectionTeacherCourseId=calSectionTeacherCourseId
+							sectionTeacherCourseId=getSectionTeacherCourseId
 								ANd 
-							toolId=calToolId);
+							toolId=getToolId
+                            AND 
+                            cloId=getCloId);
 				      select 'Record has been upated successfully' AS 'Message', true as 'Success';
+                   
+                 set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,newGetCloId);
+                    
+				 set getPreviousCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+                    call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,20,30); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,newGetCloId);
+                     
+                     update assignedmarksmetadata
+					 set 
+                     assessmentCountOfClo=getPreviousCountOfClo
+                     where 
+                     sectionTeacherCourseId=getSectionTeacherCourseId AND cloId=getCloId;  
+	
+    
+
+		else
+	select 'Record already exist' AS 'Message', false AS 'Success';
+	end if; 
+      	
+        else
+	         select 'Total Sessional Makrs should not be greater than 20' AS 'Message', false AS 'Success';
+	       end if;
+					
 		          else 
                   select 'You can only update assessment tool for practical/ section you are teaching' 
                   AS 'Message', false as 'Success';
                   end if;
+                  
+			
 			   else 
 			    select 'New Tool should be from Practical Sessional Tools' AS 'Message', false as 'Success';
 	            end if;
@@ -1513,16 +2653,25 @@ BEGIN
                else
               select 'New CLO not valid' AS 'Message', false as 'Success';
               end if;
+              
+              else
+              select 'Tool has been conducted so can not update it' AS 'Message', false as 'Success';
+              end if;
+              
                 else
 		  SELECT "Tool name is not found so can not update it " AS "Message", FALSE AS "Success";
 		  end if;
              
 				else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			   end if;
             else
             SELECT "Total marks can not be negative" AS "Message", FALSE AS "Success";
-			end if; 
+			end if;
+         else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
+			   end if;    
+		
 		 else
 		 SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
 		 end if;
@@ -1535,10 +2684,18 @@ BEGIN
 	 else
      SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
 	 end if;
+     else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
 	else
 	select 'Batch is not active' AS 'Message',false as 'Success';
 	end if;
 END
+
+
+
+
+
 
 
 
@@ -1564,7 +2721,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolSessionalTheory
       batch_Id smallint,
       teacher_Id smallint,
       course_Name varchar(20),
-      section_Id smallint,
+      course_Code char(8),
+      section_Name char(2),
       tool_Name  varchar(20),
       new_Tool_Name varchar(20),
       clo_Name char(6),
@@ -1573,64 +2731,144 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssessmentToolSessionalTheory
 )
 BEGIN
       
-      declare calCourseId smallint;
-	  declare calToolId smallint;
-      declare matchToolId smallint;
-      declare newCalToolId smallint;
-      declare calCloId mediumint;
-      declare newCalCloId smallint;
-      declare calSectionTeacherCourseId int;
+      declare getCourseId smallint;
+	  declare getToolId smallint;
+      declare newGetToolId smallint;
+      declare getCloId mediumint;
+      declare newGetCloId smallint;
+      declare getSectionTeacherCourseId int;
+      declare getSectionId smallint;
+	  declare getSessionalMarks smallint;
+      declare getFinalMarks smallint;
+      declare getCountOfClo smallint;
+      declare getPreviousCountOfClo smallint;
+      declare getPreviousSessionalCountOfClo smallint;
+      declare getPreviousFinalCountOfClo smallint;
+      declare isCourseCompleted tinyint;
+      declare isToolConducted tinyint;
+      declare shouldUpdate smallint;
+      declare getSessionalId smallint;
+      declare getTotalMarks smallint;
+      declare getSessionalCountOfClo smallint;
+      declare getFinalCountOfClo smallint;
       
 	 if(select batchId from batch 
 	 where (batchId=batch_Id and isCurrent=1)) then
 		 
-         set calCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
-		 set calToolId=(Select toolId from assessmenttools where toolName=tool_Name);
-		 set newCalToolId=(select toolId from assessmenttools where toolName=new_Tool_Name);
-	
-          if (!(calCourseId is null)) then
+         set getCourseId=(select courseId from course where courseName=course_Name 
+         and courseCode=course_Code and isPractical=0);
+		 
+         set getToolId=getToolId(tool_Name);
+		 set newGetToolId=getToolId(new_Tool_Name);
+	  
+      set getSectionId=getSection(program_Name,batch_Id,section_Name);
+		  if(getSectionId!=0) then 
+    
+          if (!(getCourseId is null)) then
 		      
-              if (!(calToolId is null))then 
+              if (!(getToolId is null))then 
         
-		         if (!(newCalToolId is null))then 
+		         if (!(newGetToolId is null))then 
 			
-			 set calSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
-			 where (sectionId=section_Id AND teacherId=teacher_Id AND courseId=calCourseId));  
+			 set getSectionTeacherCourseId=getSectionTeacherCourseId(getSectionId,teacher_Id,getCourseId);  
              
-		      if (!(calSectionTeacherCourseId is null)) then 
+		      if (!(getSectionTeacherCourseId is null)) then 
 		         
+                  set  isCourseCompleted=isCourseCompleted(getSectionTeacherCourseId);
+					   if(isCourseCompleted=0) then
+                       
                  if (!(total_Marks<=0 OR total_Marks is null)) then
-			      set calCloId= isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,clo_Name);
+			      set getCloId= isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,clo_Name);
                    
-                   if(calCloId !=0) then
-                   set matchToolId=(select sessionalId from assignedtoolclosessional 
-                         where toolId=calToolId AND sectionTeacherCourseId=calSectionTeacherCourseId
-                         AND cloId=calCloId);
-                        if(!(matchToolId is null)) then 
+                   if(getCloId !=0) then
+			
+                    set getSessionalId=getSessionalId(getToolId,getCloId,getSectionTeacherCourseId);
+
+					set getTotalMarks=getSessionalTotalMarks(getSessionalId);
+				
+                        if(getSessionalId is not null) then
+                           
+						set isToolConducted=isSessionalToolConducted(getSessionalId);
+						if(isToolConducted=0) then
+                        
                    
-	              	set newCalCloId=isBatchCourseValidForUpdate(program_Name,calCourseId,batch_Id,new_Clo_Name);
-                     if(newCalCloId !=0) then
+	              	set newGetCloId=isBatchCourseValidForUpdate(program_Name,getCourseId,batch_Id,new_Clo_Name);
+                     if(newGetCloId !=0) then
                     if(isSessional(tool_Name)!=0) then
                     
                      if(isSessional(new_Tool_Name)!=0) then 
 					
-                      if(isTeacherValid(teacher_Id,section_Id,course_Name)='Both' OR
-                          isTeacherValid(teacher_Id,section_Id,course_Name)='Theory')
-					  then 
+                      if(isTeacherValid(teacher_Id,getSectionId,course_Name)='Both' OR
+                          isTeacherValid(teacher_Id,getSectionId,course_Name)='Theory')
+                     then
+                     
+                      set getSessionalMarks=getSumOfSessionalMarks(getSectionTeacherCourseId);
+				
+                    if(getSessionalMarks is null) then
+                    set getSessionalMarks=0;
+                    set getSessionalMarks=getSessionalMarks+total_Marks;
+                    else 
+                    set getSessionalMarks= getSessionalMarks+total_Marks-getTotalMarks;
+                    end if;
+                    
+				set getFinalMarks=getSumOfFinalMarks(getSectionTeacherCourseId);
+                    
+                    if(getFinalMarks is null) then
+                    set getFinalMarks=0;
+                    end if;
+                    
+				if(getSessionalMarks<41) then
+			
+                    set shouldUpdate=getSessionalId(newGetToolId,newGetCloId,getSectionTeacherCourseId);
+		
+                       if(shouldUpdate is null OR shouldUpdate=getSessionalId) then
 					   update assignedtoolclosessional 
 					   set 
-							toolId=newCalToolId,
-							cloId=newCalCloId,
+							toolId=newGetToolId,
+							cloId=newGetCloId,
 							totalMarks=total_Marks
 					   where(
-							sectionTeacherCourseId=calSectionTeacherCourseId
+							sectionTeacherCourseId=getSectionTeacherCourseId
 								ANd 
-							toolId=calToolId);
+							toolId=getToolId
+                            AND 
+                              cloId=getCloId);
 				      select 'Record has been upated successfully' AS 'Message', true as 'Success';
+                      
+                
+                   set getCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,newGetCloId);
+                    
+				   set getPreviousCountOfClo=getTotalCountOfClo(getSectionTeacherCourseId,getCloId);
+                    
+                    call assignedMarksMetaData(getSessionalMarks,getFinalMarks,
+                    getSectionTeacherCourseId,40,60); 
+                    
+                    call assignedCloMarksMetaData(getCountOfClo,getSectionTeacherCourseId,newGetCloId);
+                     
+                     update assignedmarksmetadata
+					  set 
+                     sumOfSessionalMarks=getSessionalMarks,
+                     sumOfFinalMarks=getFinalMarks,
+                     assessmentCountOfClo=getPreviousCountOfClo
+                     where 
+                     sectionTeacherCourseId=getSectionTeacherCourseId AND cloId=getCloId;
+                     
+                     
+    
+    else
+	select 'Record already exist' AS 'Message', false AS 'Success';
+	end if; 
+      
+	else
+	select 'Total Sessional Makrs should not be greater than 40' AS 'Message', false AS 'Success';
+	end if;
+                      
 		          else 
                   select 'You can only add assessment tool for theory/ section you are teaching' 
                   AS 'Message', false as 'Success';
                   end if;
+                  
+	
 			   else 
 			    select 'New Tool should be from Sessional Tools' AS 'Message', false as 'Success';
 	            end if;
@@ -1640,15 +2878,21 @@ BEGIN
               else 
               SELECT 'New CLO Name is not valid' AS 'MEssage', FALSE AS 'Success';
               end if;
+              else
+              select 'Tool has been conducted so can not update it' AS 'Message', false as 'Success';
+              end if;
               		  else
 		  SELECT "Tool name is not found so can not update it " AS "Message", FALSE AS "Success";
 		  end if;
 				else
-               SELECT "This course is not enrolled for this program/batch" AS "Message", FALSE AS "Success";
+               SELECT "CLO not exist for this program" AS "Message", FALSE AS "Success";
 			   end if;
             else
             SELECT "Total marks can not be negative" AS "Message", FALSE AS "Success";
 			end if; 
+             else
+               SELECT "Course is completed" AS "Message", FALSE AS "Success";
+			   end if;
 		 else
 		 SELECT "You are not teaching this course to this section" AS "Message", FALSE AS "Success";
 		 end if;
@@ -1661,6 +2905,9 @@ BEGIN
 	 else
      SELECT "Course Name is incorrect" AS "Message", FALSE AS "Success";
 	 end if;
+     else 
+           select 'Section not exist' AS 'Message', false as 'Success';
+        end if;
 	else
 	select 'Batch is not active' AS 'Message',false as 'Success';
 	end if;
@@ -1681,19 +2928,79 @@ END
 
 
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `viewAssessmentCriteria`(
-student_Id mediumint, course_Id smallint
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateAssignedMarksMetaData`(
+getSessionalMarks smallint,
+getFinalMarks smallint,
+getCountOfClo smallint,
+getSectionTeacherCourseId int,
+newgetCloId smallint,
+getRequiredSumOfSessionalMarks smallint,
+getRequiredSumOfFinalMarks smallint
 )
 BEGIN
 
-declare sectionIdofLoggedStudent smallint;
-declare sectionTeacherCourseIdofLoggedStudent int;
+	update assignedmarksmetadata
+	set 
+		sumOfSessionalMarks=getSessionalMarks,
+		sumOfFinalMarks=getFinalMarks,
+		assessmentCountOfClo=getCountOfClo,
+        requiredSessionalMarks=getRequiredSumOfSessionalMarks,
+        requiredFinalMarks=getRequiredSumOfFinalMarks
+        
+		where 
+		sectionTeacherCourseId=getSectionTeacherCourseId AND cloId=newgetCloId;
+END
 
-set sectionIdofLoggedStudent=(select sectionId from student where 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `viewAssessmentCriteria`(
+student_Id mediumint,
+course_Name varchar(60),
+course_Code char(8),
+is_Practical tinyint
+)
+BEGIN
+
+declare getSectionId smallint;
+declare getSectionTeacherCourseId int;
+declare getCourseId smallint;
+
+set getCourseId=(select courseId from course where courseName=course_Name 
+and courseCode=course_Code and isPractical=is_Practical);
+
+set getSectionId=(select sectionId from student where 
 studentId IN (student_Id)); 
 
-set sectionTeacherCourseIdofLoggedStudent=(select sectionTeacherCourseId from sectionteachercoursejunction
-where sectionId IN(sectionIdofLoggedStudent) and courseId IN(course_Id));
+set getSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
+where sectionId IN(getSectionId) and courseId IN(getCourseId));
 
 select
 toolName,
@@ -1705,7 +3012,7 @@ join assessmenttools t
 join systemclo c
    using (cloId)
 join sectionteachercoursejunction stcj 
-where stcj.sectionTeacherCourseId IN (sectionTeacherCourseIdofLoggedStudent) AND tcs.sectionTeacherCourseId= stcj.sectionTeacherCourseId
+where stcj.sectionTeacherCourseId IN (getSectionTeacherCourseId) AND tcs.sectionTeacherCourseId= stcj.sectionTeacherCourseId
 
 UNION
 
@@ -1719,8 +3026,15 @@ join assessmenttools t
 join systemclo c
    using (cloId)
 join sectionteachercoursejunction stcj 
-where stcj.sectionTeacherCourseId IN (sectionTeacherCourseIdofLoggedStudent) AND tcf.sectionTeacherCourseId= stcj.sectionTeacherCourseId;
+where stcj.sectionTeacherCourseId IN (getSectionTeacherCourseId) AND tcf.sectionTeacherCourseId= stcj.sectionTeacherCourseId;
 END
+
+
+
+
+
+
+
 
 
 
@@ -1739,7 +3053,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `viewFinalPracticalReport`(
 	batch_Id smallint,
 	section_Name char(2),
 	student_Id mediumint,
-    course_Name varchar(60)
+    course_Name varchar(60),
+    course_Code char(8)
 )
 BEGIN
 
@@ -1751,7 +3066,8 @@ BEGIN
   set getProgramId=(select programId from program where programName=program_Name);
   set getSectionId=(select sectionId from section where sectionName=section_Name 
   AND batchId=batch_Id AND programId=getProgramId);
-  set getCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
+  set getCourseId=(select courseId from course where courseName=course_Name 
+  and courseCode=course_Code and isPractical=1);
   
   set getSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
   where sectionId IN(getSectionId) and courseId IN(getCourseId));
@@ -1786,6 +3102,11 @@ AND s.studentId=smo.studentId;
 
 
 END
+
+
+
+
+
 
 
 
@@ -1809,7 +3130,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `viewFinalTheoryReport`(
 	batch_Id smallint,
 	section_Name char(2),
 	student_Id mediumint,
-    course_Name varchar(60)
+    course_Name varchar(60),
+    course_Code char(8)
 )
 BEGIN
 
@@ -1821,7 +3143,8 @@ BEGIN
   set getProgramId=(select programId from program where programName=program_Name);
   set getSectionId=(select sectionId from section where sectionName=section_Name 
   AND batchId=batch_Id AND programId=getProgramId);
-  set getCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
+  set getCourseId=(select courseId from course where courseName=course_Name
+  and courseCode=course_Code and isPractical=0);
   
   set getSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
   where sectionId IN(getSectionId) and courseId IN(getCourseId));
@@ -1871,12 +3194,23 @@ END
 
 
 
+
+
+
+
+
+
+
+
+
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `viewSessionalPracticalReport`(
 	program_Name varchar(50),
 	batch_Id smallint,
 	section_Name char(2),
 	student_Id mediumint,
-    course_Name varchar(60)
+    course_Name varchar(60),
+    course_Code char(8)
 )
 BEGIN
   declare getProgramId smallint;
@@ -1887,7 +3221,8 @@ BEGIN
   set getProgramId=(select programId from program where programName=program_Name);
   set getSectionId=(select sectionId from section where sectionName=section_Name 
   AND batchId=batch_Id AND programId=getProgramId);
-  set getCourseId=(select courseId from course where courseName=course_Name and isPractical=1);
+  set getCourseId=(select courseId from course where courseName=course_Name
+  and courseCode=course_Code and isPractical=1);
   
   set getSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
   where sectionId IN(getSectionId) and courseId IN(getCourseId));
@@ -1919,6 +3254,14 @@ where toolId=a.toolId AND cloId=sc.cloId AND sectionTeacherCourseId IN(getSectio
 AND smo.sessionalId=tcs.sessionalId
 AND s.studentId=smo.studentId;
 END
+
+
+
+
+
+
+
+
 
 
 
@@ -1939,7 +3282,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `viewSessionalTheoryReport`(
 	batch_Id smallint,
 	section_Name char(2),
 	student_Id mediumint,
-    course_Name varchar(60)
+    course_Name varchar(60),
+    course_Code char(8)
 )
 BEGIN
 
@@ -1951,7 +3295,8 @@ BEGIN
   set getProgramId=(select programId from program where programName=program_Name);
   set getSectionId=(select sectionId from section where sectionName=section_Name 
   AND batchId=batch_Id AND programId=getProgramId);
-  set getCourseId=(select courseId from course where courseName=course_Name and isPractical=0);
+  set getCourseId=(select courseId from course where courseName=course_Name 
+  and courseCode=course_Code and isPractical=0);
   
   set getSectionTeacherCourseId=(select sectionTeacherCourseId from sectionteachercoursejunction
   where sectionId IN(getSectionId) and courseId IN(getCourseId));
@@ -1984,8 +3329,3 @@ AND smo.sessionalId=tcs.sessionalId
 AND s.studentId=smo.studentId;
 
 END
-
-
-
-
-
