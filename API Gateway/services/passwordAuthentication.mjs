@@ -1,12 +1,12 @@
 'use strict';
-import { Router, urlencoded } from 'express';
+import { Router, json } from 'express';
 import { postProxyRequest } from '../operations/proxiedRouting.mjs';
 import { getJWTSecret } from '../apigatewayconfig.mjs';
 import jwt from 'jsonwebtoken';
 
 const passwordAuth = Router();
 
-passwordAuth.use(urlencoded({ extended: false }));
+passwordAuth.use(json());
 
 passwordAuth.post('/', authenticatePassword, postProxyRequest);
 
@@ -21,7 +21,7 @@ function authenticatePassword(req, res, next) {
     try {
       const { uid, pid, tid } = jwt.verify(token, getJWTSecret());
       res.send({
-        loggedId: true,
+        loggedIn: true,
         data: jwt.sign({ uid, pid, tid }, getJWTSecret())
       });
     } catch (err) {

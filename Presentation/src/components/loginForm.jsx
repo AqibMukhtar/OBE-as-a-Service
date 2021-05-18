@@ -17,12 +17,12 @@ const options = [
 class LoginForm extends Form {
   state = {
     selectedOption: null,
-    data: { username: "", password: "", selectedOption: null },
+    data: { userName: "", password: "", selectedOption: null },
     errors: {},
   };
 
   schema = {
-    username: Joi.string().required().label("Username"),
+    userName: Joi.string().required().label("Username"),
     password: Joi.string().required().label("Password"),
     selectedOption: Joi.required(),
   };
@@ -31,7 +31,7 @@ class LoginForm extends Form {
     try {
       const { data, selectedOption } = this.state;
       const { data: jwt } = await login(
-        data.username,
+        data.userName,
         data.password,
         selectedOption.value
       );
@@ -40,7 +40,7 @@ class LoginForm extends Form {
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         const errors = { ...this.state.errors };
-        errors.username = ex.response.data;
+        errors.userName = ex.response.data;
         this.setState({ errors });
       }
     }
@@ -61,13 +61,13 @@ class LoginForm extends Form {
             <form onSubmit={this.handleSubmit}>
               <div className="txt_field">
                 <Input
-                  name="username"
-                  value={data.username}
+                  name="userName"
+                  value={data.userName}
                   label="Username"
                   placeholder="Enter Username"
                   type="text"
                   onChange={this.handleChange}
-                  error={errors.username}
+                  error={errors.userName}
                 />
                 <Input
                   name="password"

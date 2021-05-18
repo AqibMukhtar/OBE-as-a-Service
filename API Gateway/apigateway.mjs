@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { readFileSync } from 'fs';
 import { createServer } from 'https';
 
@@ -13,6 +14,8 @@ import authenticate from './operations/authentication.mjs';
 import { getAPIGatewayPort } from './apigatewayconfig.mjs';
 
 const app = express();
+
+app.use(cors());
 
 app.use('/api/password_auth', passwordAuth);
 

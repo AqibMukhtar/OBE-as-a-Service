@@ -29,8 +29,9 @@ app.post('/api/password_auth/', (req, res) => {
   const {
     formData: { userName, password, type }
   } = req.body;
+
   switch (type) {
-    case 'Teacher':
+    case 'teacher':
       db.query(
         `CALL authenticateTeacher(?,?);`,
         [userName, password],
@@ -48,7 +49,7 @@ app.post('/api/password_auth/', (req, res) => {
         }
       );
       break;
-    case 'OBE Cell':
+    case 'obecell':
       db.query(
         `CALL authenticateOBECell(?, ?);`,
         [password, userName],
@@ -63,7 +64,7 @@ app.post('/api/password_auth/', (req, res) => {
         }
       );
       break;
-    case 'Admin':
+    case 'admin':
       db.query(
         `CALL authenticateAdmin(?, ?);`,
         [password, userName],
@@ -78,7 +79,7 @@ app.post('/api/password_auth/', (req, res) => {
         }
       );
       break;
-    case 'Student':
+    case 'student':
       db.query(
         `CALL authenticateStudent(?, ?);`,
         [password, userName],
