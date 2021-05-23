@@ -1049,3 +1049,74 @@ BEGIN
 		SELECT "Something went wrong" AS "Message", FALSE AS "Success";
 	END IF;
 END
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `authenticateAdmin`(admin_password VARCHAR(20), admin_email VARCHAR(50))
+BEGIN
+	DECLARE auth_result BOOLEAN DEFAULT 
+    (SELECT SHA1(admin_password) = AES_DECRYPT(adminPassword, getKey()) 
+    FROM adminpassword WHERE adminId = 
+    (SELECT `admin`.`adminId` FROM `obe-as-a-service`.`admin`
+	WHERE `admin`.`adminEmail` = admin_email));
+    
+    IF auth_result = TRUE THEN
+		SELECT TRUE AS "Authenticated", adminId, programId FROM  `obe-as-a-service`.`admin` 
+        WHERE adminEmail = admin_email;
+    ELSE
+		SELECT FALSE AS "Authenticated";
+    END IF;
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `authenticateOBECell`(obe_password VARCHAR(20), obe_email VARCHAR(50))
+BEGIN
+	DECLARE auth_result BOOLEAN DEFAULT
+	(SELECT SHA1(obe_password) = AES_DECRYPT(obePassword, getKey()) 
+    FROM obepassword WHERE obeId = 
+	(SELECT obeId FROM obecell WHERE obeEmail = obe_email));
+    
+    IF auth_result = TRUE THEN
+		SELECT TRUE AS "Authenticated", obeId, programId FROM obecell WHERE 
+        obeEmail = obe_email;
+    ELSE
+		SELECT FALSE AS "Authenticated";
+    END IF;
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `authenticateStudent`(student_password VARCHAR(20), student_id VARCHAR(50))
+BEGIN
+	DECLARE auth_result BOOLEAN DEFAULT 
+    (SELECT SHA1(student_password) = AES_DECRYPT(studentPassword, getKey()) 
+    FROM studentpassword WHERE studentId = student_id);
+    
+    IF auth_result = TRUE THEN
+		SELECT TRUE AS "Authenticated", studentId, programId FROM student WHERE 
+        studentId = student_id;
+	ELSE
+		SELECT FALSE AS "Authenticated";
+    END IF;
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `authenticateTeacher`(teacher_email VARCHAR(50),
+teacher_password VARCHAR(20))
+BEGIN
+	DECLARE auth_result BOOLEAN DEFAULT
+    (SELECT SHA1(teacher_password) = AES_DECRYPT(teacherPassword, getKey()) 
+    FROM teacherpassword WHERE teacherId = 
+	(SELECT teacherId FROM teacher WHERE teacherEmail = teacher_email));
+    IF auth_result = TRUE THEN
+		SELECT TRUE AS "Authenticated", teacherId, programId FROM teacher WHERE 
+        teacherEmail = teacher_email;
+	ELSE
+		SELECT FALSE AS "Authenticated";
+    END IF;
+END
