@@ -423,3 +423,21 @@ BEGIN
         TRUE AS "Success";
 	END IF;
 END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `generateSecurePassword`(user_password VARCHAR(20)) RETURNS blob
+    DETERMINISTIC
+BEGIN
+	RETURN AES_ENCRYPT(SHA1(user_password), getKey());
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `getKey`() RETURNS char(128) CHARSET utf8mb4
+    DETERMINISTIC
+BEGIN
+	RETURN "743777217A25432A462D4A614E645266";
+END

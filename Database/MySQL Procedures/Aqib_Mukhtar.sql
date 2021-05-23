@@ -896,3 +896,51 @@ END
 IF;
 
 END
+
+
+
+
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addStudents`(program_id tinyint, batch_id smallint, section_name char(2), student_id mediumint, student_name varchar(50) , student_gender char(6), student_email varchar(50), student_roll_number char(10), student_password VARCHAR(20))
+BEGIN
+	declare section_verification boolean default sectionIdVerify(program_id, batch_id, section_name);
+	declare section_id smallint;
+    declare batch_year tinyint default batchYear(batch_id);
+    declare record_exists boolean default isSectionStudentCourseRecordExisting(student_id);
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT "Something went wrong" AS "Message", FALSE AS "Success";
+    END;
+    
+    set section_id = (select sectionId from section where programId = program_id AND batchId = batch_id AND sectionName = section_name);
+    if !section_verification then
+		SELECT "This section does not exist" AS "Message", FALSE AS "Success";
+	elseif batch_year != 1 then
+		SELECT "you can only add students of current batch" AS "Message", FALSE AS "Success";
+	elseif record_exists then
+		SELECT "Record of this student already exist" AS "Message", FALSE AS "Success";
+	else
+    START TRANSACTION;
+		SET autocommit = 0;
+		INSERT INTO student (studentId, sectionId, programId, batchId, studentName, studentGender, studentEmail, studentRollNumber)
+        VALUES (student_id, section_id, program_id, batch_id, student_name, student_gender, student_email, student_roll_number);
+		
+        INSERT INTO `obe-as-a-service`.`studentpassword`(`studentId`, `studentPassword`)
+		VALUES (student_id, generateSecurePassword(student_password));
+
+        Create Table temp(courseid smallint not null, sectionid smallint, studentid mediumint, primary key (courseid) );
+		insert into temp(courseid)
+		select courseId from programcoursejunction where programId = program_id AND batchId = batch_id;
+		UPDATE temp SET sectionid = section_id where courseid != 0;
+		UPDATE temp SET studentid = student_id where courseid != 0;
+		INSERT INTO sectionstudentcoursejunction (sectionId, studentId, courseId)
+		SELECT sectionId, studentId, courseid from temp;
+		SELECT "Student successfully added" AS "Message", TRUE AS "SUCCESS";
+		drop table temp;
+	COMMIT;
+    end if;
+END
