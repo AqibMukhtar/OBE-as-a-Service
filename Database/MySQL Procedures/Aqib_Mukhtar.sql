@@ -1120,3 +1120,15 @@ BEGIN
 		SELECT FALSE AS "Authenticated";
     END IF;
 END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getTechingCourses`(teacher_id SMALLINT)
+BEGIN
+SELECT 
+c.courseCode, c.courseName, c.isPractical, t.teacherName
+FROM sectionteachercoursejunction stcj JOIN course c JOIN teacher t 
+ON stcj.courseId = c.courseId AND stcj.teacherId = t.teacherId 
+WHERE stcj.teacherId = teacher_id AND isCompleted = 0;
+END

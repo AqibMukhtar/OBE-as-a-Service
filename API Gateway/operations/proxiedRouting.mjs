@@ -8,7 +8,6 @@ function mergeObjectsValid(formData, user) {
 }
 
 async function getProxyRequest(req, res) {
-  console.log(req);
   const { user, originalUrl: endPoint, baseUrl, query: queryData } = req;
   const serviceName = baseUrl.replace('/api/', '');
   const url = findServiceIp(serviceName) + endPoint.split('?')[0];

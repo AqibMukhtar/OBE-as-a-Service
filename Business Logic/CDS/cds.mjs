@@ -19,8 +19,10 @@ const app = express();
 const port = getServicePort('cds');
 
 app.get('/api/cds/teacher/view_teaching_course/', (req, res) => {
-  console.log(req);
-  res.send('Server Response');
+  const { tid: teacherId } = req.query;
+  db.query(`CALL getTechingCourses(?);`, [teacherId], (err, result) =>
+    err ? res.sendStatus(400) : res.send(result[0])
+  );
 });
 
 app.listen(port, () => {

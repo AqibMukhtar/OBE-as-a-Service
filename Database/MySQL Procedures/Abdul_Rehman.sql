@@ -3329,3 +3329,105 @@ AND smo.sessionalId=tcs.sessionalId
 AND s.studentId=smo.studentId;
 
 END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addAdmin`(admin_email VARCHAR(50), 
+admin_name VARCHAR(50), 
+program_id TINYINT,
+gender CHAR(6), 
+admin_password VARCHAR(20))
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT "Something went wrong" AS "Message", FALSE AS "Success";
+    END;
+    IF gender = 'Male' OR gender = 'Female' THEN
+		START TRANSACTION;
+		SET autocommit = 0;
+		
+        INSERT INTO `obe-as-a-service`.`admin`
+		(`programId`, `adminEmail`, `adminName`, `adminGender`)
+		VALUES
+		(program_id, admin_email, admin_name, gender);
+        
+        INSERT INTO `obe-as-a-service`.`adminpassword`
+		(`adminId`, `adminPassword`) VALUES
+		(LAST_INSERT_ID(), generateSecurePassword(admin_password));
+        
+        SELECT "Admin has been added" AS "Message", TRUE AS "Success";
+        
+        COMMIT;
+    ELSE
+		SELECT "Incorrect information" AS "Message", FALSE AS "Success";
+	END IF;
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addTeacher`(teacher_email VARCHAR(50), 
+teacher_name VARCHAR(50), 
+program_id TINYINT, 
+designation VARCHAR(30), 
+gender CHAR(6), 
+teacher_password VARCHAR(20))
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT "Something went wrong" AS "Message", FALSE AS "Success";
+    END;
+    IF gender = 'Male' OR gender = 'Female' THEN
+		START TRANSACTION;
+		SET autocommit = 0;
+		
+        INSERT INTO `obe-as-a-service`.`teacher`
+		(`teacherEmail`,`teacherName`,`programId`,`teacherDesignationId`,`teacherGender`)
+		VALUES
+		(teacher_email, teacher_name, program_id, designation, gender);
+        
+        INSERT INTO `obe-as-a-service`.`teacherpassword`
+		(`teacherId`, `teacherPassword`)
+		VALUES
+		(LAST_INSERT_ID(), generateSecurePassword(teacher_password));
+        
+        SELECT "Teacher has been added" AS "Message", TRUE AS "Success";
+        
+        COMMIT;
+    ELSE
+		SELECT "Something went wrong" AS "Message", FALSE AS "Success";
+	END IF;
+END
+
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addOBECellMember`(email VARCHAR(50), obe_name VARCHAR(50), gender CHAR(6), program_id TINYINT,
+obe_password VARCHAR(20))
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT "Something went wrong" AS "Message", FALSE AS "Success";
+    END;
+    IF gender = 'Male' OR gender = 'Female' THEN
+		START TRANSACTION;
+		SET autocommit = 0;
+		
+        INSERT INTO `obe-as-a-service`.`obecell`
+		(`programId`, `obeEmail`, `obeName`, `obeGender`)
+		VALUES
+		(program_id, email, obe_name, gender);
+        
+        INSERT INTO `obe-as-a-service`.`obepassword`
+		(`obeId`, `obePassword`)
+		VALUES
+		(LAST_INSERT_ID(), generateSecurePassword(obe_password));
+        
+        SELECT "OBE Cell memeber has been added" AS "Message", TRUE AS "Success";
+        
+        COMMIT;
+    ELSE
+		SELECT "Something went wrong" AS "Message", FALSE AS "Success";
+	END IF;
+END
