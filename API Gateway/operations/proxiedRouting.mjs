@@ -8,11 +8,12 @@ function mergeObjectsValid(formData, user) {
 }
 
 async function getProxyRequest(req, res) {
-  const { user, originalUrl: endPoint, baseUrl, body: formData } = req;
+  console.log(req);
+  const { user, originalUrl: endPoint, baseUrl, query: queryData } = req;
   const serviceName = baseUrl.replace('/api/', '');
-  const url = findServiceIp(serviceName) + endPoint;
+  const url = findServiceIp(serviceName) + endPoint.split('?')[0];
   let data;
-  if (mergeObjectsValid(formData, user)) data = { ...formData, ...user };
+  if (mergeObjectsValid(queryData, user)) data = { ...queryData, ...user };
   else return res.sendStatus(400);
   try {
     const response = await axios.get(url, { params: data });
