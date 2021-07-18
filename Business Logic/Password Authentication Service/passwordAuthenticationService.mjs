@@ -12,7 +12,7 @@ import {
 const db = createConnection({
   host: "localhost",
   user: "root",
-  password: "ab2236dul&&",
+  password: "OBEaaS123",
   database: "OBE-as-a-Service",
 });
 db.connect((err) => {
