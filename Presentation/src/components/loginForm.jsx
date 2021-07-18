@@ -45,7 +45,7 @@ class LoginForm extends Form {
             toast.error("First Log in ");
             this.props.history.push("/login");
           } else {
-            setProps.history.push("/navbar");
+            setProps.history.push("/courses");
             toast.error("You have already logged in");
             localStorage.removeItem("token");
             console.log("Previous Token Removed");
@@ -77,7 +77,7 @@ class LoginForm extends Form {
         toast.error("Invalid username or password");
       else {
         localStorage.setItem("token", jwt.data);
-        this.props.history.push("/navbar");
+        this.props.history.push("/courses");
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {
