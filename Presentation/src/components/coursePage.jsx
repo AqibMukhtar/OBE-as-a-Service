@@ -6,9 +6,7 @@ import Footer from './footer';
 const CoursePage = () => {
     return (  
         <React.Fragment>
-            <Navbar/>
-            <TeacherCourse/>
-            <Footer/>            
+                 
         </React.Fragment>
     );
 }

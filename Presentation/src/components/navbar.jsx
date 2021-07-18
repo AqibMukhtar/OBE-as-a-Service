@@ -3,6 +3,7 @@ import logo from "./ned.PNG";
 import { Link } from "react-router-dom";
 import Footer from "./footer";
 import "./css/navbar.css";
+import TeacherCourse from "./teacherCourse";
 
 const Navbar = (props) => {
   return (
@@ -81,49 +82,8 @@ const Navbar = (props) => {
         </div>
       </nav>
       <div className="container mt-4">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-      </div>
-      <br></br>
-      <div className="container">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-      </div>
-      <br></br>
-      <div className="container">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores amet,
-        doloremque accusamus ratione deleniti eos nobis commodi inventore
-        suscipit adipisci dignissimos hic modi pariatur voluptatem obcaecati
-        earum repellendus sint et!<br></br>
-      </div>
+        <TeacherCourse/>
+        </div>
       <Footer />
     </div>
   );

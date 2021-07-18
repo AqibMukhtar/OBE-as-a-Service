@@ -5,7 +5,7 @@
   bottom: 0;
   left: 0;
   padding: 20px 0 0px 0;
-  margin-top: 100px;
+  margin-top: 297px;
   width: 100%;
   display: flex;
 }
@@ -45,7 +45,7 @@ h4 {
   margin: 0px 50px 10px 50px;
   background: rgb(211, 206, 206);
   font-size: 15px;
-  /* height: auto; */
+  height: auto;
 }
 .below-side {
   float: left;

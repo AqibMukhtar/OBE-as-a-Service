@@ -19,11 +19,10 @@ function App() {
           <Route path="/" exact component={LoginForm} />
           <Route path="/login" exact component={LoginForm} />
           <Route path="/logout" exact component={Logout} />
-          <Route path="/navbar" component={Navbar} />
-          <Route path="/courses" component={CoursePage}/>
+          <Route path="/courses" component={Navbar} />
+          
         </Switch>
       </div>
-      <TeacherCourse />
     </React.Fragment>
   );
 }
