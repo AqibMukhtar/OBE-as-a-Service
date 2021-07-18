@@ -10,8 +10,7 @@ class TeacherCourse extends Component {
     axios
       .get("https://20.204.30.1/api/cds/teacher/view_teaching_course", {
         headers: {
-          "X-Access-Token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE4LCJwaWQiOjEsInRpZCI6MSwiaWF0IjoxNjI2NTg5OTMwfQ.3-22BOARRhmel-yVLRjCbR4Cf4fL91Zu1m5scjtFk2Q",
+          "X-Access-Token": getTokken
         },
       })
       .then((response) => {
