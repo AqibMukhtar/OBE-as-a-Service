@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/courseActions.css';
 
-class courseActions extends Component {
+class CourseActions extends Component {
     state = {
         courseName: "Software Engineering",
         courseCode: "SE-207"
@@ -15,11 +15,10 @@ class courseActions extends Component {
                 <div>
                 <button type="button" className="course-btn">Course Learning Outcomes (CLOs)</button>
                 <button type="button" className="course-btn">Assessment Tools</button>
-                <button type="button" className="course-btn">Request For CLO Management</button>
                 </div>
             </React.Fragment>
         );
     }
 }
 
-export default courseActions;
+export default CourseActions;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/teacherCourse.css'
 
-class courseDisplay extends Component {
+class CourseDisplay extends Component {
     state = {  }
     render() { 
         return (
@@ -10,4 +10,4 @@ class courseDisplay extends Component {
     }
 }
  
-export default courseDisplay;
+export default CourseDisplay;
