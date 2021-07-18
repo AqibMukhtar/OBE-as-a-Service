@@ -9,7 +9,7 @@ const port = getServicePort("peo_management");
 const db = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : '12345',
+    password : 'OBEaaS123',
     database : 'OBE-as-a-Service'
 });
 db.connect(err => {
