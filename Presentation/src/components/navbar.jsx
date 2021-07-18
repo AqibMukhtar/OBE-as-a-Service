@@ -39,7 +39,7 @@ const Navbar = (props) => {
             href="https://www.neduet.edu.pk/"
             target="_blank"
           >
-            <img className="setImage" src={logo} />
+            <img className="setImage" src={logo} alt="" />
           </a>
           <button
             className="navbar-toggler"
@@ -72,7 +72,7 @@ const Navbar = (props) => {
             </ul>
             <form className="d-flex">
               <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                <Link className="nav-link" to="/login">
+                <Link className="nav-link" to="/logout">
                   Logout
                 </Link>
               </ul>

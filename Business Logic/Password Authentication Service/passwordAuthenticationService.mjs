@@ -1,43 +1,43 @@
-'use strict';
+"use strict";
 
-import express from 'express';
-import { createConnection } from 'mysql';
-import jwt from 'jsonwebtoken';
+import express from "express";
+import { createConnection } from "mysql";
+import jwt from "jsonwebtoken";
 
 import {
   getServicePort,
-  getJWTSecret
-} from '../../API Gateway/apigatewayconfig.mjs';
+  getJWTSecret,
+} from "../../API Gateway/apigatewayconfig.mjs";
 
 const db = createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '12345',
-  database: 'OBE-as-a-Service'
+  host: "localhost",
+  user: "root",
+  password: "ab2236dul&&",
+  database: "OBE-as-a-Service",
 });
-db.connect(err => {
+db.connect((err) => {
   if (err) throw err;
-  console.log('Password Authentication Service connected to the database.');
+  console.log("Password Authentication Service connected to the database.");
 });
 
 const app = express();
-const port = getServicePort('password_auth');
+const port = getServicePort("password_auth");
 
 app.use(express.json());
 
-app.post('/api/password_auth/', (req, res) => {
+app.post("/api/password_auth/", (req, res) => {
   const {
-    formData: { userName, password, type }
+    formData: { userName, password, type },
   } = req.body;
 
   switch (type) {
-    case 'teacher':
+    case "teacher":
       db.query(
         `CALL authenticateTeacher(?,?);`,
         [userName, password],
         (err, result) => {
           if (err) res.send({});
-          else if (result[0][0]['Authenticated']) {
+          else if (result[0][0]["Authenticated"]) {
             const { teacherId, programId } = result[0][0];
             res.send(
               jwt.sign(
@@ -49,13 +49,13 @@ app.post('/api/password_auth/', (req, res) => {
         }
       );
       break;
-    case 'obecell':
+    case "obecell":
       db.query(
         `CALL authenticateOBECell(?, ?);`,
         [password, userName],
         (err, result) => {
           if (err) res.send({});
-          else if (result[0][0]['Authenticated']) {
+          else if (result[0][0]["Authenticated"]) {
             const { obeId, programId } = result[0][0];
             res.send(
               jwt.sign({ uid: obeId, pid: programId, tid: 2 }, getJWTSecret())
@@ -64,12 +64,12 @@ app.post('/api/password_auth/', (req, res) => {
         }
       );
       break;
-    case 'admin':
+    case "admin":
       db.query(
         `CALL authenticateAdmin(?, ?);`,
         [password, userName],
         (err, result) => {
-          if (err || !result[0][0]['Authenticated']) res.send({});
+          if (err || !result[0][0]["Authenticated"]) res.send({});
           else {
             const { adminId, programId } = result[0][0];
             res.send(
@@ -79,12 +79,12 @@ app.post('/api/password_auth/', (req, res) => {
         }
       );
       break;
-    case 'student':
+    case "student":
       db.query(
         `CALL authenticateStudent(?, ?);`,
         [password, userName],
         (err, result) => {
-          if (err || !result[0][0]['Authenticated']) res.send({});
+          if (err || !result[0][0]["Authenticated"]) res.send({});
           else {
             const { studentId, programId } = result[0][0];
             res.send(
@@ -106,10 +106,10 @@ app.post('/api/password_auth/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log('Password Authentication Service is running on port:', port);
+  console.log("Password Authentication Service is running on port:", port);
 });
 
-process.on('exit', code => {
+process.on("exit", (code) => {
   db.end();
   console.log(`Password Authentication Service exiting with status ${code}`);
 });

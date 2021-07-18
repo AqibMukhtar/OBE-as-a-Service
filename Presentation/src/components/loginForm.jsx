@@ -1,12 +1,13 @@
 import React from "react";
 import Select from "react-select";
+import { toast } from "react-toastify";
+import axios from "axios";
 import Joi from "joi-browser";
 import Form from "./form";
 import Input from "./input";
-import { login } from "../services/authService";
+import auth from "../services/authService";
 import LoginFormNavbar from "./loginFormNavbar";
 import "./css/loginform.css";
-// import "./css/loginformnavbar.css";
 
 const options = [
   { value: "teacher", label: "Teacher" },
@@ -22,33 +23,74 @@ class LoginForm extends Form {
   };
 
   schema = {
-    userName: Joi.string().required().label("Username"),
+    userName: Joi.string().required().label("username"),
     password: Joi.string().required().label("Password"),
     selectedOption: Joi.required(),
   };
 
+  componentDidMount() {
+    const setProps = this.props;
+    async function submit(props) {
+      let user = localStorage.getItem("token");
+      function setJwt(user) {
+        axios.defaults.headers.common["X-Access-Token"] = user;
+        console.log("reqeust send");
+      }
+      try {
+        if (user) {
+          setJwt(user);
+          const headerResponse = await auth.login({});
+          console.log(headerResponse.data);
+          if (Object.keys(headerResponse.data).length == 0) {
+            toast.error("First Log in ");
+            this.props.history.push("/login");
+          } else {
+            setProps.history.push("/navbar");
+            toast.error("You have already logged in");
+            localStorage.removeItem("token");
+            console.log("Previous Token Removed");
+            localStorage.setItem("token", headerResponse.data);
+            console.log("New Token Added in memory");
+            console.log(headerResponse);
+          }
+        }
+      } catch (ex) {
+        if (ex.response && ex.response.status === 401) {
+          localStorage.removeItem("token");
+          window.location = "/login";
+          toast.error("Unauthorized please log in again");
+        }
+      }
+    }
+    submit();
+  }
+
   doSubmit = async () => {
     try {
       const { data, selectedOption } = this.state;
-      const { data: jwt } = await login(
+      const jwt = await auth.login(
         data.userName,
         data.password,
         selectedOption.value
       );
-      localStorage.setItem("token", jwt);
-      this.props.history.push("/login");
+      if (Object.keys(jwt.data).length == 0)
+        toast.error("Invalid username or password");
+      else {
+        localStorage.setItem("token", jwt.data);
+        this.props.history.push("/navbar");
+      }
     } catch (ex) {
-      if (ex.response && ex.response.status === 400) {
+      if (ex.response && ex.response.status === 401) {
         const errors = { ...this.state.errors };
         errors.userName = ex.response.data;
         this.setState({ errors });
+        console.log(errors);
       }
     }
   };
 
   handleOnChange = (selectedOption) => {
     this.setState({ selectedOption });
-    console.log(`Option selected:`, selectedOption.value);
   };
   render() {
     const { data, errors, selectedOption } = this.state;
