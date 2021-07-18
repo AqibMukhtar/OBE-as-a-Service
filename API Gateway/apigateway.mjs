@@ -8,6 +8,7 @@ import cloRequest from './services/cloRequest.mjs';
 import cloCommit from './services/cloCommit.mjs';
 import cloApprove from './services/cloApprove.mjs';
 import passwordAuth from './services/passwordAuthentication.mjs';
+import cds from './services/cds.mjs';
 
 import authenticate from './operations/authentication.mjs';
 
@@ -25,6 +26,7 @@ app.use('/api/peo_management', peoManagement);
 app.use('/api/clo_request', cloRequest);
 app.use('/api/clo_approve', cloApprove);
 app.use('/api/clo_commit', cloCommit);
+app.use('/api/cds', cds);
 
 app.all('*', (req, res) => res.sendStatus(404));
 

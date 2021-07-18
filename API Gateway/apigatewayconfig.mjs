@@ -101,6 +101,17 @@ const configurationData = {
           authUsers: [2]
         }
       ]
+    },
+    cds: {
+      ip: '127.0.0.1',
+      protocol: 'http',
+      port: '8000',
+      endpoints: [
+        {
+          name: '/api/cds/teacher/view_teaching_course/',
+          authUsers: [1]
+        }
+      ]
     }
   }
 };

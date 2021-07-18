@@ -1,0 +1,23 @@
+{
+  "name": "content-delivery-service",
+  "version": "1.0.0",
+  "description": "Content Delivery Service for OBEaaS",
+  "main": "cds.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AqibMukhtar/OBE-as-a-Service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AqibMukhtar/OBE-as-a-Service/issues"
+  },
+  "homepage": "https://github.com/AqibMukhtar/OBE-as-a-Service#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  }
+}
