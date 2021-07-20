@@ -20,7 +20,7 @@ function App() {
           <Route path="/login" exact component={LoginForm} />
           <Route path="/logout" exact component={Logout} />
           <Route path="/courses" component={Navbar} />
-          
+
         </Switch>
       </div>
     </React.Fragment>

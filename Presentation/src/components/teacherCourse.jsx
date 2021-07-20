@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import CourseDisplay from "./courseDisplay";
+import Logout from './logout';
+import LoginForm from "./loginForm";
 import "./css/teacherCourse.css";
 import axios from "axios";
 
@@ -17,10 +19,24 @@ class TeacherCourse extends Component {
         const data = response.data.data;
         this.setState({ courses: data });
         this.setName();
-        console.log(data);
+        console.log(this.state.courses);
+        console.log(getTokken);
       })
-      .catch((error) => console.log(error));
-  };
+      .catch((error) => {
+        console.log(error);
+        console.log(error.response.status);
+        const expectedError =
+        error.response.status >= 300 ||
+        error.response.status < 200;
+        this.setState({expectedError});
+      if (expectedError) {
+        alert("An error occurred");
+        window.location="/logout";
+      }
+      return Promise.reject(error);
+      })
+  }
+
 
   componentDidMount() {
     this.getData();
@@ -33,23 +49,33 @@ class TeacherCourse extends Component {
   };
 
   state = {
+    expectedError: false,
     teacherName: "",
     courses: [],
   };
   render() {
     return (
       <React.Fragment>
+          { !this.state.expectedError &&
+            < div>
+              <h1 className="heading">{this.state.teacherName}</h1>
+              <p className="para">You are teaching the following courses:</p>
+              {this.state.courses.map((course) => (
+                <CourseDisplay
+                  key={course.courseCode}
+                  courseId={course.courseCode}
+                  courseName={course.courseName}
+                />
+            ))}
+          </div>
+        }
+
+        {/* {this.state.expectedError &&
         <div>
-          <h1 className="heading">{this.state.teacherName}</h1>
-          <p className="para">You are teaching the following courses:</p>
-          {this.state.courses.map((course) => (
-            <CourseDisplay
-              key={course.courseCode}
-              courseId={course.courseCode}
-              courseName={course.courseName}
-            />
-          ))}
+          <Logout/>
         </div>
+
+        } */}
       </React.Fragment>
     );
   }
