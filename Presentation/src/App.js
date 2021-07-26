@@ -6,6 +6,7 @@ import Logout from "./components/logout";
 import Navbar from "./components/navbar";
 import TeacherCourse from "./components/teacherCourse";
 import CoursePage from "./components/coursePage";
+import CourseActions from "./components/courseActions";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
@@ -20,7 +21,7 @@ function App() {
           <Route path="/login" exact component={LoginForm} />
           <Route path="/logout" exact component={Logout} />
           <Route path="/courses" component={Navbar} />
-
+          <Route path="/actions" component={CourseActions}/>
         </Switch>
       </div>
     </React.Fragment>

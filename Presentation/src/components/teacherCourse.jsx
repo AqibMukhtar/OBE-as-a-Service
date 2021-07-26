@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import CourseDisplay from "./courseDisplay";
-import Logout from './logout';
-import LoginForm from "./loginForm";
+import CourseActions from "./courseActions";
 import "./css/teacherCourse.css";
 import axios from "axios";
+
 
 const getTokken = localStorage.getItem("token");
 
@@ -46,36 +45,38 @@ class TeacherCourse extends Component {
     const teacher = this.state.courses[0];
     const teacherName = teacher.teacherName;
     this.setState({ teacherName });
-  };
+  }
+
+  handleOnClick = (course) => {
+    this.setState({showActions: true});
+    this.setState({selectedCourse: course})
+  }
 
   state = {
     expectedError: false,
+    showActions: false,
     teacherName: "",
     courses: [],
-  };
+    selectedCourse: []
+  }
   render() {
     return (
       <React.Fragment>
-          { !this.state.expectedError &&
-            < div>
+          { !this.state.expectedError && !this.state.showActions &&
+            <div>
               <h1 className="heading">{this.state.teacherName}</h1>
               <p className="para">You are teaching the following courses:</p>
-              {this.state.courses.map((course) => (
-                <CourseDisplay
-                  key={course.courseCode}
-                  courseId={course.courseCode}
-                  courseName={course.courseName}
+              {this.state.courses.map((course) => <button type="button" className="course-btn" onClick={() => this.handleOnClick(course)}>{course.courseName} ({course.courseCode})</button>
+            )}
+            </div>
+          }
+          { !this.state.expectedError && this.state.showActions &&
+            <div>
+                <CourseActions
+                  course = {this.state.selectedCourse}
                 />
-            ))}
-          </div>
-        }
-
-        {/* {this.state.expectedError &&
-        <div>
-          <Logout/>
-        </div>
-
-        } */}
+            </div>
+          }
       </React.Fragment>
     );
   }

@@ -1,24 +1,49 @@
 import React, { Component } from 'react';
+import CourseClo from './courseClo';
 import './css/courseActions.css';
 
 class CourseActions extends Component {
+    
+            handleOnClickCLO = () => {
+            this.setState({showCLO: true})
+        }
+
+        handleOnClickAssessmentTool = () => {
+            this.setState({showAssessmentTool: true})
+        }
+    
     state = {
-        courseName: "Software Engineering",
-        courseCode: "SE-207"
-    }
-    render() { 
-        return (
-            <React.Fragment>
+        showCLO: false,
+        showAssessmentTool: false
+      }
+    render() {
+        return (  
+            <React.Fragment>   
+            {!this.state.showCLO && !this.state.showAssessmentTool &&
                 <div>
-                    <h1 className="heading">{this.state.courseName} ({this.state.courseCode})</h1>
+                    <h1 className="heading">{this.props.course.courseName} ({this.props.course.courseCode})</h1>
+                    <button type="button" className="course-btn" onClick={this.handleOnClickCLO}>Course Learning Outcomes (CLOs)</button>
+                    <button type="button" className="course-btn" onClick={this.handleOnClickAssessmentTool}>Assessment Tools</button>
                 </div>
+                }
+
+            {this.state.showCLO && !this.state.showAssessmentTool &&
                 <div>
-                <button type="button" className="course-btn">Course Learning Outcomes (CLOs)</button>
-                <button type="button" className="course-btn">Assessment Tools</button>
+                    <CourseClo
+                        selectedCourse = {this.props.course}
+                    />
                 </div>
-            </React.Fragment>
+            }
+
+            {!this.state.showCLO && this.state.showAssessmentTool &&
+                <div>
+
+                </div>
+            }
+
+    </React.Fragment>
         );
     }
 }
-
+ 
 export default CourseActions;
