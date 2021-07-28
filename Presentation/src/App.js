@@ -9,6 +9,7 @@ import CoursePage from "./components/coursePage";
 import CourseActions from "./components/courseActions";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import AssessmentToolsActions from "./components/assessmentToolsActions";
 
 
 function App() {

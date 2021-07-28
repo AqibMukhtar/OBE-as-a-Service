@@ -12,8 +12,8 @@ class AssessmentToolsActions extends Component {
                 <div>
                     <button type="button" className="course-btn">View Assessment Tools</button>
                     <button type="button" className="course-btn">Edit Assessment Tools</button>
-                    <button type="button" className="course-btn">Delete Assessment Tool</button>
                     <button type="button" className="course-btn">Add Assessment Tool</button>
+                    <button type="button" className="course-btn">Delete Assessment Tool</button>
                 </div>
             </React.Fragment>
           );

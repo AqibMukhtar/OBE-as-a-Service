@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import AssessmentToolsActions from './assessmentToolsActions';
 import CourseClo from './courseClo';
 import './css/courseActions.css';
 
@@ -37,7 +38,7 @@ class CourseActions extends Component {
 
             {!this.state.showCLO && this.state.showAssessmentTool &&
                 <div>
-
+                    <AssessmentToolsActions/>
                 </div>
             }
 
