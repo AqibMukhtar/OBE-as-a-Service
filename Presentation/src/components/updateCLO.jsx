@@ -6,9 +6,9 @@ const UpdateCLO = () => {
 
 return (
     <MDBContainer>
-        <MDBRow className="center">
+        <MDBRow className="center-container">
             <form>
-                <h1>Update CLO</h1>
+                <h1 className="h2 text-center mb-2">Update CLO</h1>
                 <label className="grey-text">
                 Course ID
                 </label>
