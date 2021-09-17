@@ -6,6 +6,7 @@ const cds = Router();
 
 cds.get('/teacher/view_teaching_course/', authorize, getProxyRequest);
 cds.get('/view_course_clos/', authorize, getProxyRequest);
+cds.get('/teacher/view_assessment_tools/', authorize, getProxyRequest);
 
 cds.all('*', (req, res) => res.sendStatus(404));
 
