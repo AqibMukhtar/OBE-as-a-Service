@@ -7,15 +7,19 @@ import Navbar from "./components/navbar";
 import TeacherCourse from "./components/teacherCourse";
 import CoursePage from "./components/coursePage";
 import CourseActions from "./components/courseActions";
+import OBECellActions from "./components/OBECellActions";
+import AddCLO from "./components/addCLO";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import AssessmentToolsActions from "./components/assessmentToolsActions";
+import UpdateCLO from "./components/updateCLO";
+import DeleteCLO from "./components/deleteCLO";
 
 
 function App() {
   return (
     <React.Fragment>
-      <ToastContainer />
+      {/* <ToastContainer />
       <div className="content">
         <Switch>
           <Route path="/" exact component={LoginForm} />
@@ -24,7 +28,8 @@ function App() {
           <Route path="/courses" component={Navbar} />
           <Route path="/actions" component={CourseActions}/>
         </Switch>
-      </div>
+      </div> */}
+      <DeleteCLO/>
     </React.Fragment>
   );
 }
