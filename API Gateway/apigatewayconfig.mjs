@@ -120,6 +120,17 @@ const configurationData = {
           authUsers: [1]
         }
       ]
+    },
+    assessment_tool_definition: {
+      ip: '127.0.0.1',
+      protocol: 'http',
+      port: '9000',
+      endpoints: [
+        {
+          name: '/api/assessment_tool_definition/teacher/sessional/theory/',
+          authUsers: [1]
+        }
+      ]
     }
   }
 };
