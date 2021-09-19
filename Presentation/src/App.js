@@ -19,7 +19,7 @@ import DeleteCLO from "./components/deleteCLO";
 function App() {
   return (
     <React.Fragment>
-      {/* <ToastContainer />
+      <ToastContainer />
       <div className="content">
         <Switch>
           <Route path="/" exact component={LoginForm} />
@@ -28,8 +28,7 @@ function App() {
           <Route path="/courses" component={Navbar} />
           <Route path="/actions" component={CourseActions}/>
         </Switch>
-      </div> */}
-      <DeleteCLO/>
+      </div>
     </React.Fragment>
   );
 }
