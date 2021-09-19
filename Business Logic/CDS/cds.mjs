@@ -33,7 +33,7 @@ app.get('/api/cds/view_course_clos/', (req, res) => {
 });
 
 app.get('/api/cds/teacher/view_assessment_tools/', (req, res) => {
-  const {pid : programId, courseId, uid : teacherId, batchId} = req.query;
+  const {programId, courseId, uid : teacherId, batchId} = req.query;
   db.query('CALL viewAssessmentToolsOfCourse(?,?,?,?)', [teacherId, programId, courseId, batchId], (err, result) =>
     err ? res.sendStatus(400) : res.send(result[0])
   );
