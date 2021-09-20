@@ -1,85 +1,79 @@
-import React, { Component } from "react";
-import CourseActions from "./courseActions";
-import "./css/teacherCourse.css";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
-
+import "./css/teacherCourse.css";
 
 const getTokken = localStorage.getItem("token");
 
-class TeacherCourse extends Component {
-  getData = () => {
-    axios
-      .get("https://20.204.30.1/api/cds/teacher/view_teaching_course", {
-        headers: {
-          "X-Access-Token": getTokken
-        },
-      })
-      .then((response) => {
-        const data = response.data.data;
-        this.setState({ courses: data });
-        this.setName();
-        console.log(this.state.courses);
-        console.log(getTokken);
-      })
-      .catch((error) => {
-        console.log(error);
-        console.log(error.response.status);
-        const expectedError =
-        error.response.status >= 300 ||
-        error.response.status < 200;
-        this.setState({expectedError});
-      if (expectedError) {
-        alert("An error occurred");
-        window.location="/logout";
-      }
-      return Promise.reject(error);
-      })
-  }
+const TeacherCourse = () => {
+  const [teacherData, setTeacherData] = useState([]);
+  const [teacherName, setTeacherName] = useState("");
+  const [selectedCourses, setSelectedCourses] = useState([]);
+  const history = useHistory();
 
+  const getTeacherData = async () => {
+    try {
+      const teacherBulkData = await axios.get(
+        "https://20.204.30.1/api/cds/teacher/view_teaching_course",
+        {
+          headers: {
+            "X-Access-Token": getTokken,
+          },
+        }
+      );
+      setTeacherData(teacherBulkData.data.data);
+      console.log(teacherData);
+      setTeacherName(teacherData[0].teacherName);
+      console.log(teacherName);
+    } catch (error) {}
+  };
 
-  componentDidMount() {
-    this.getData();
-  }
+  const handleOnClick = (courseData) => {
+    console.log("this is handle on click");
+    console.log(courseData);
+    setSelectedCourses(courseData);
+    console.log("this is selected courses");
+    console.log(selectedCourses);
+  };
 
-  setName = () => {
-    const teacher = this.state.courses[0];
-    const teacherName = teacher.teacherName;
-    this.setState({ teacherName });
-  }
+  const nextPage = () => {
+    history.push({
+      pathname: "/course/course-details",
+      state: {
+        selectedCourses: selectedCourses,
+      },
+    });
+  };
 
-  handleOnClick = (course) => {
-    this.setState({showActions: true});
-    this.setState({selectedCourse: course})
-  }
+  useEffect(() => {
+    if (selectedCourses.length != 0) {
+      nextPage();
+    }
+  }, [selectedCourses]);
 
-  state = {
-    expectedError: false,
-    showActions: false,
-    teacherName: "",
-    courses: [],
-    selectedCourse: []
-  }
-  render() {
-    return (
-      <React.Fragment>
-          { !this.state.expectedError && !this.state.showActions &&
-            <div>
-              <h1 className="heading">{this.state.teacherName}</h1>
-              <p className="para">You are teaching the following courses:</p>
-              {this.state.courses.map((course) => <button type="button" className="course-btn" onClick={() => this.handleOnClick(course)}>{course.courseName} ({course.courseCode})</button>
-            )}
-            </div>
-          }
-          { !this.state.expectedError && this.state.showActions &&
-            <div>
-                <CourseActions
-                  course = {this.state.selectedCourse}
-                />
-            </div>
-          }
-      </React.Fragment>
-    );
-  }
-}
+  useEffect(() => {
+    getTeacherData();
+  }, [teacherData]);
+
+  return (
+    <>
+      <div>
+        <h1 className="heading">{teacherName}</h1>
+        <p className="para">You are teaching the following courses:</p>
+
+        {teacherData.map((courseData) => (
+          <button
+            type="button"
+            className="course-btn"
+            onClick={() => handleOnClick(courseData)}
+          >
+            {courseData.courseName} ({courseData.courseCode}) ( Section:{" "}
+            {courseData.sectionName})
+          </button>
+        ))}
+      </div>
+    </>
+  );
+};
 
 export default TeacherCourse;
