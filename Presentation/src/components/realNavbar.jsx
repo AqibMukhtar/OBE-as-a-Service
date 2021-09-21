@@ -1,11 +1,9 @@
 import React from "react";
 import logo from "./ned.PNG";
 import { Link } from "react-router-dom";
-import Footer from "./footer";
 import "./css/navbar.css";
-import TeacherCourse from "./teacherCourse";
 
-const Navbar = (props) => {
+const RealNavbar = (props) => {
   return (
     <div>
       <div className="topDiv">
@@ -81,12 +79,12 @@ const Navbar = (props) => {
           </div>
         </div>
       </nav>
-      <div className="container mt-4">
+      {/* <div className="container mt-4">
         <TeacherCourse />
-      </div>
-      <Footer />
+      </div> */}
+      {/* <Footer /> */}
     </div>
   );
 };
 
-export default Navbar;
+export default RealNavbar;

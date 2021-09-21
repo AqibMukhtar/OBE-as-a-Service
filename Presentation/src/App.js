@@ -4,17 +4,13 @@ import { ToastContainer } from "react-toastify";
 import LoginForm from "./components/loginForm";
 import Logout from "./components/logout";
 import Navbar from "./components/navbar";
-import TeacherCourse from "./components/teacherCourse";
-import CoursePage from "./components/coursePage";
 import CourseActions from "./components/courseActions";
-import OBECellActions from "./components/OBECellActions";
-import AddCLO from "./components/addCLO";
+import CourseClo from "./components/courseClo";
+import AssessmentToolsActions from "./components/assessmentToolsActions";
+import ViewAssessmentTool from "./components/viewAssessmentTool";
+import AddAssessmentTool from "./components/addAssessmentTool";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import AssessmentToolsActions from "./components/assessmentToolsActions";
-import UpdateCLO from "./components/updateCLO";
-import DeleteCLO from "./components/deleteCLO";
-
 
 function App() {
   return (
@@ -26,7 +22,20 @@ function App() {
           <Route path="/login" exact component={LoginForm} />
           <Route path="/logout" exact component={Logout} />
           <Route path="/courses" component={Navbar} />
-          <Route path="/actions" component={CourseActions}/>
+          <Route path="/course/course-details" component={CourseActions} />
+          <Route path="/course/course-detail/clo" component={CourseClo} />
+          <Route
+            path="/course/course-detail/assessment-tools"
+            component={AssessmentToolsActions}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/view-assessment-tool"
+            component={ViewAssessmentTool}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/add-assessment-tool"
+            component={AddAssessmentTool}
+          />
         </Switch>
       </div>
     </React.Fragment>

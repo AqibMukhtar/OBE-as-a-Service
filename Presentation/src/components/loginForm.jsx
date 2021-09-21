@@ -78,7 +78,6 @@ class LoginForm extends Form {
       else {
         localStorage.setItem("token", jwt.data);
         this.props.history.push("/courses");
-        console.log(this.state.selectedOption.value);
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {

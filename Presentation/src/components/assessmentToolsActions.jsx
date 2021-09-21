@@ -1,23 +1,73 @@
-import React, { Component } from 'react';
-import './css/teacherCourse.css';
+import React from "react";
+import { useHistory, useLocation } from "react-router";
+import "./css/teacherCourse.css";
+import Footer from "./footer";
+import RealNavbar from "./realNavbar";
 
+const AssessmentToolsActions = () => {
+  const location = useLocation();
+  const history = useHistory();
 
-class AssessmentToolsActions extends Component {
-    state = {  
-    }
+  const handleViewAssessmentTool = () => {
+    history.push({
+      pathname: "/course/course-detail/assessment-tool/view-assessment-tool",
+      state: {
+        programId: location.state.programId,
+        batchId: location.state.batchId,
+        courseId: location.state.courseId,
+        courseName: location.state.courseName,
+        courseCode: location.state.courseCode,
+      },
+    });
+  };
 
-    render() { 
-        return (
-            <React.Fragment>
-                <div>
-                    <button type="button" className="course-btn">View Assessment Tools</button>
-                    <button type="button" className="course-btn">Edit Assessment Tools</button>
-                    <button type="button" className="course-btn">Add Assessment Tool</button>
-                    <button type="button" className="course-btn">Delete Assessment Tool</button>
-                </div>
-            </React.Fragment>
-          );
-    }
-}
- 
-export default AssessmentToolsActions
+  const handleAddAssessmentTool = () => {
+    history.push({
+      pathname: "/course/course-detail/assessment-tool/add-assessment-tool",
+      state: {
+        programId: location.state.programId,
+        batchId: location.state.batchId,
+        courseId: location.state.courseId,
+        courseName: location.state.courseName,
+        courseCode: location.state.courseCode,
+        sectionName: location.state.sectionName,
+        programName: location.state.programName,
+        isPractical: location.state.isPractical,
+      },
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <RealNavbar />
+      <div className="container mt-4">
+        <h2 className="heading">
+          {location.state.courseName} ({location.state.courseCode})
+        </h2>
+        <button
+          type="button"
+          className="course-btn"
+          onClick={handleViewAssessmentTool}
+        >
+          View Assessment Tools
+        </button>
+        <button
+          type="button"
+          className="course-btn"
+          onClick={handleAddAssessmentTool}
+        >
+          Add Assessment Tool
+        </button>
+        <button type="button" className="course-btn">
+          Edit Assessment Tools
+        </button>
+        <button type="button" className="course-btn">
+          Delete Assessment Tool
+        </button>
+      </div>
+      <Footer />
+    </React.Fragment>
+  );
+};
+
+export default AssessmentToolsActions;

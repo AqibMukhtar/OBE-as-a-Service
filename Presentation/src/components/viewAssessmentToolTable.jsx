@@ -10,12 +10,17 @@ import Paper from "@material-ui/core/Paper";
 import RealNavbar from "./realNavbar";
 import Footer from "./footer";
 
+// Defining table width
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
 });
 
+//Get token from localstorage
+const getTokken = localStorage.getItem("token");
+
+//Styling the cells of the table
 const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: theme.palette.info.dark,
@@ -26,6 +31,7 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
+//Styling the rows of the table
 const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
@@ -34,7 +40,7 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const CloTable = (props) => {
+const ViewAssessmentToolTable = (props) => {
   const classes = useStyles();
 
   return (
@@ -49,38 +55,28 @@ const CloTable = (props) => {
           <Table className={classes.table} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>CLO Name</StyledTableCell>
-                <StyledTableCell align="center">
-                  CLO Description
-                </StyledTableCell>
-                <StyledTableCell align="center">PLO ID</StyledTableCell>
-                <StyledTableCell align="center">PLO Name</StyledTableCell>
-                <StyledTableCell align="center">
-                  PLO Description
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  Taxonomy Level Name
-                </StyledTableCell>
-                <StyledTableCell align="center">Taxonomy ID</StyledTableCell>
+                <StyledTableCell>Tool Name</StyledTableCell>
+                <StyledTableCell align="center">CLO Name</StyledTableCell>
+                <StyledTableCell align="center">Section Name</StyledTableCell>
+                <StyledTableCell align="center">Total Marks</StyledTableCell>
+                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.data.map((d) => (
-                <StyledTableRow key={d.cloName}>
-                  <StyledTableCell>{d.cloName}</StyledTableCell>
+              {props.data.map((tool) => (
+                <StyledTableRow key={tool.toolName}>
+                  <StyledTableCell>{tool.toolName}</StyledTableCell>
                   <StyledTableCell align="center">
-                    {d.cloDescription}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">{d.ploId}</StyledTableCell>
-                  <StyledTableCell align="center">{d.ploName}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    {d.ploDescription}
+                    {tool.cloName}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {d.taxonomyLevelName}
+                    {tool.sectionName}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {d.taxonomyLevelShortHand}
+                    {tool.totalMarks}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {tool.isConducted == "0" ? "Not Conducted" : "Conducted"}
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
@@ -93,4 +89,4 @@ const CloTable = (props) => {
   );
 };
 
-export default CloTable;
+export default ViewAssessmentToolTable;

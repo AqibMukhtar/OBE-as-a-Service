@@ -1,52 +1,43 @@
-import React, { Component } from 'react';
+import React, { useState } from "react";
+import { useEffect } from "react";
+import { useLocation } from "react-router";
+import CloTable from "./cloTable";
 import axios from "axios";
-import CloTable from './cloTable';
 
 const getTokken = localStorage.getItem("token");
 
-class CourseClo extends Component {
+const CourseClo = () => {
+  const location = useLocation();
+  const [cloBulkData, setCloBulkData] = useState([]);
+  const getCloData = async () => {
+    try {
+      const CloBulkData = await axios.get(
+        "https://20.204.30.1/api/cds/view_course_clos?programId=" +
+          location.state.programId +
+          "&courseId=" +
+          location.state.courseId,
+        {
+          headers: {
+            "X-Access-Token": getTokken,
+          },
+        }
+      );
+      setCloBulkData(CloBulkData.data.data);
+    } catch (error) {}
+  };
 
-  getData = () => {
-    axios
-      .get("https://20.204.30.1/api/cds/view_course_clos?programId="+ this.props.selectedCourse.programId +"&courseId="+ this.props.selectedCourse.courseId, {
-        headers: {
-          "X-Access-Token": getTokken
-        },
-      })
-      .then((response) => {
-        const data = response.data.data;
-        this.setState({ allData: data });
-        console.log(this.state.allData);
-      })
-      .catch((error) => {
-        console.log(error);
-        console.log(error.response.status);
-        const expectedError =
-        error.response.status >= 300 ||
-        error.response.status < 200;
-        this.setState({expectedError});
-      if (expectedError) {
-        alert("An error occurred");
-        window.location="/logout";
-      }
-      return Promise.reject(error);
-      })
-  }
+  useEffect(() => {
+    getCloData();
+  });
 
-  componentDidMount() {
-    this.getData();
-  }
+  console.log(cloBulkData);
+  return (
+    <CloTable
+      data={cloBulkData}
+      courseName={location.state.courseName}
+      courseCode={location.state.courseCode}
+    />
+  );
+};
 
-  state = { 
-    allData: []
-   }
-  render() { 
-    return (
-      <CloTable
-        data = {this.state.allData}
-      />
-     );
-  }
-}
- 
 export default CourseClo;
