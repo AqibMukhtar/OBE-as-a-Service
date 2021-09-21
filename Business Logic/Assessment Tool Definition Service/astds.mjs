@@ -21,9 +21,39 @@ const port = getServicePort('assessment_tool_definition');
 app.use(express.json());
 
 app.post('/api/assessment_tool_definition/teacher/sessional/theory/', (req, res) => {
-  const { user : {uid, pid}, formData} = req.body;
-  res.send(formData);
-  console.log(req);
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName, totalMarks
+  }} = req.body;
+  db.query('CALL addAssessmentToolSessionalTheory(?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0]));
+});
+
+app.post('/api/assessment_tool_definition/teacher/sessional/practical/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName, totalMarks
+  }} = req.body;
+  db.query('CALL addAssessmentToolSessionalPractical(?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0]));  
+});
+
+app.post('/api/assessment_tool_definition/teacher/final/theory/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName, totalMarks
+  }} = req.body;
+  db.query('CALL addAssessmentToolFinalTheory(?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/final/practical/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName, totalMarks
+  }} = req.body;
+  db.query('CALL addAssessmentToolFinalPractical(?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
 });
 
 app.listen(port, () => {
