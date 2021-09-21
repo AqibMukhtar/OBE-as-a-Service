@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { urlencoded } from 'express';
+import { json } from 'express';
 import { postProxyRequest} from '../operations/proxiedRouting.mjs';
 import authorize from '../operations/authorization.mjs';
 
 const cloRequest = Router();
 
-cloRequest.use(urlencoded({extended:false}));
+cloRequest.use(jaon());
 
 cloRequest.post('/teacher/add_clo', authorize, postProxyRequest);
 cloRequest.post('/teacher/update_clo', authorize, postProxyRequest);
