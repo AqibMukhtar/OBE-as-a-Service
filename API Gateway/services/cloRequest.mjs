@@ -5,7 +5,7 @@ import authorize from '../operations/authorization.mjs';
 
 const cloRequest = Router();
 
-cloRequest.use(jaon());
+cloRequest.use(json());
 
 cloRequest.post('/teacher/add_clo', authorize, postProxyRequest);
 cloRequest.post('/teacher/update_clo', authorize, postProxyRequest);
