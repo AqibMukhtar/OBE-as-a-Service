@@ -112,72 +112,72 @@ const AddAssessmentTool = () => {
 
   return (
     <>
-      <div className="background">
+      <div className="add-background">
         <div className="container mt-4">
-          <div className="center">
+          <div className="add-center">
             <h2>Add Assessment Tool</h2>
             <form>
-              <div className="txt_field">
-                <div className="form-group">
-                  <label className="login_label">Program Name</label>
+              <div className="add-txt-field">
+                <div>
+                  <label className="add-login-label">Program Name</label>
                   <br></br>
                   <input
                     defaultValue={location.state.programName}
                     disabled
                     id="programName"
                     name="programName"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                   />
                   <br></br>
-                  <label className="login_label">BatchId</label>
+                  <label className="add-login-label">BatchId</label>
                   <br></br>
                   <input
                     defaultValue={location.state.batchId}
                     disabled
                     id="batchId"
                     name="batchId"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                   />
-                  <label className="login_label">Course Name</label>
+                  <label className="add-login-label">Course Name</label>
                   <br></br>
                   <input
                     defaultValue={location.state.courseName}
                     disabled
                     id="courseName"
                     name="courseName"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                   />
-                  <label className="login_label">Course Code </label>
+                  <label className="add-login-label">Course Code </label>
                   <br></br>
                   <input
                     defaultValue={location.state.courseCode}
                     disabled
                     id="courseCode"
                     name="courseCode"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                   />
                   <br></br>
-                  <label className="login_label">Course Type </label>
+                  <label className="add-login-label">Course Type </label>
                   <br></br>
                   <input
                     value={courseType}
                     disabled
                     id="courseCode"
                     name="courseCode"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                   />
                   <br></br>
-                  <label className="login_label">Section Name</label>
+                  <label className="add-login-label">Section Name</label>
                   <br></br>
                   <input
                     defaultValue={location.state.sectionName}
                     id="sectionName"
                     name="sectionName"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                     placeholder="B"
                   />
                   <br></br>
-                  <label className="login_label">Tool Type</label>
+                  <label className="add-login-label">Tool Type</label>
                   <br></br>
                   <input
                     value={toolType}
@@ -185,24 +185,24 @@ const AddAssessmentTool = () => {
                     placeholder="Sessional / Final"
                     id="toolType"
                     name="toolType"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                     onChange={(e) => setToolType(e.target.value)}
                   />
                   <br></br>
 
-                  <label className="login_label">Tool Name</label>
+                  <label className="add-login-label">Tool Name</label>
                   <br></br>
                   <input
                     value={toolName}
                     required
                     id="toolName"
                     name="toolName"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                     placeholder="Quiz 01"
                     onChange={(e) => setToolName(e.target.value)}
                   />
                   <br></br>
-                  <label className="login_label">CLO Name</label>
+                  <label className="add-login-label">CLO Name</label>
                   <br></br>
                   <input
                     value={cloName}
@@ -210,18 +210,18 @@ const AddAssessmentTool = () => {
                     placeholder="CLO-01"
                     id="cloName"
                     name="cloName"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                     onChange={(e) => setCloName(e.target.value)}
                   />
                   <br></br>
-                  <label className="login_label">Total Marks </label>
+                  <label className="add-login-label">Total Marks </label>
                   <br></br>
                   <input
                     value={totalMarks}
                     required
                     id="totalMarks"
                     name="totalMarks"
-                    className="txt_field_input"
+                    className="add-txt-field-input"
                     placeholder="09"
                     onChange={(e) => setTotalMarks(e.target.value)}
                   />
