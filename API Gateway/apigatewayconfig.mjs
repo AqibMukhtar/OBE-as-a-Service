@@ -129,7 +129,20 @@ const configurationData = {
         {
           name: '/api/assessment_tool_definition/teacher/sessional/theory/',
           authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/sessional/practical/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/final/theory/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/final/practical/',
+          authUsers: [1]
         }
+        
       ]
     }
   }
