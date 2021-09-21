@@ -9,15 +9,12 @@ import "./css/addAssessmentTool.css";
 
 const getTokken = localStorage.getItem("token");
 
-const AddAssessmentTool = () => {
+const DeleteAssessmentToolForm = () => {
   const [courseType, setCourseType] = useState("");
-  const [toolType, setToolType] = useState("");
-  const [toolName, setToolName] = useState("");
-  const [cloName, setCloName] = useState("");
-  const [totalMarks, setTotalMarks] = useState();
   const location = useLocation();
   const history = useHistory();
   const handle = location.state.isPractical;
+  console.log(handle);
 
   //Header to be send through post request
   let axiosHeader = {
@@ -33,128 +30,128 @@ const AddAssessmentTool = () => {
     courseName: location.state.courseName,
     courseCode: location.state.courseCode,
     sectionName: location.state.sectionName,
-    toolName,
-    cloName,
-    totalMarks,
+    toolName: location.state.toolName,
+    cloName: location.state.cloName,
+    totalMarks: location.state.totalMarks,
   };
 
   //Post Request
-  const handleAdd = () => {
-    if (
-      (toolType === "sessional" ||
-        toolType === "Sessional" ||
-        toolType === "SESSIONAL") &&
-      handle === 0
-    ) {
-      axios
-        .post(
-          "https://20.204.30.1/api/assessment_tool_definition/teacher/sessional/theory/",
-          data,
-          axiosHeader
-        )
-        .then(
-          (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
-            }
+  //   const handleDelete = () => {
+  //     if (
+  //       (toolType === "sessional" ||
+  //         toolType === "Sessional" ||
+  //         toolType === "SESSIONAL") &&
+  //       handle === 0
+  //     ) {
+  //       axios
+  //         .post(
+  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/sessional/theory/",
+  //           data,
+  //           axiosHeader
+  //         )
+  //         .then(
+  //           (response) => {
+  //             if (response.data.data[0].Success === 1) {
+  //               toast.success(response.data.data[0].Message);
+  //               history.push({
+  //                 pathname: "/courses/course-detail/assessment-tools",
+  //               });
+  //             }
 
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
-          },
-          (error) => {
-            toast.error(error);
-          }
-        );
-    }
-    if (
-      (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-      handle === 0
-    ) {
-      axios
-        .post(
-          "https://20.204.30.1/api/assessment_tool_definition/teacher/final/theory/",
-          data,
-          axiosHeader
-        )
-        .then(
-          (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
-            }
+  //             if (response.data.data[0].Success === 0)
+  //               toast.error(response.data.data[0].Message);
+  //           },
+  //           (error) => {
+  //             toast.error(error);
+  //           }
+  //         );
+  //     }
+  //     if (
+  //       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
+  //       handle === 0
+  //     ) {
+  //       axios
+  //         .post(
+  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/final/theory/",
+  //           data,
+  //           axiosHeader
+  //         )
+  //         .then(
+  //           (response) => {
+  //             if (response.data.data[0].Success === 1) {
+  //               toast.success(response.data.data[0].Message);
+  //               history.push({
+  //                 pathname: "/courses/course-detail/assessment-tools",
+  //               });
+  //             }
 
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
-          },
-          (error) => {
-            toast.error(error);
-          }
-        );
-    }
+  //             if (response.data.data[0].Success === 0)
+  //               toast.error(response.data.data[0].Message);
+  //           },
+  //           (error) => {
+  //             toast.error(error);
+  //           }
+  //         );
+  //     }
 
-    if (
-      (toolType === "sessional" ||
-        toolType === "Sessional" ||
-        toolType === "SESSIONAL") &&
-      handle === 1
-    ) {
-      axios
-        .post(
-          "https://20.204.30.1/api/assessment_tool_definition/teacher/sessional/practical/",
-          data,
-          axiosHeader
-        )
-        .then(
-          (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
-            }
+  //     if (
+  //       (toolType === "sessional" ||
+  //         toolType === "Sessional" ||
+  //         toolType === "SESSIONAL") &&
+  //       handle === 1
+  //     ) {
+  //       axios
+  //         .post(
+  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/sessional/practical/",
+  //           data,
+  //           axiosHeader
+  //         )
+  //         .then(
+  //           (response) => {
+  //             if (response.data.data[0].Success === 1) {
+  //               toast.success(response.data.data[0].Message);
+  //               history.push({
+  //                 pathname: "/courses/course-detail/assessment-tools",
+  //               });
+  //             }
 
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
-          },
-          (error) => {
-            toast.error(error);
-          }
-        );
-    }
+  //             if (response.data.data[0].Success === 0)
+  //               toast.error(response.data.data[0].Message);
+  //           },
+  //           (error) => {
+  //             toast.error(error);
+  //           }
+  //         );
+  //     }
 
-    if (
-      (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-      handle === 1
-    ) {
-      axios
-        .post(
-          "https://20.204.30.1/api/assessment_tool_definition/teacher/final/practical/",
-          data,
-          axiosHeader
-        )
-        .then(
-          (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
-            }
+  //     if (
+  //       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
+  //       handle === 1
+  //     ) {
+  //       axios
+  //         .post(
+  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/final/practical/",
+  //           data,
+  //           axiosHeader
+  //         )
+  //         .then(
+  //           (response) => {
+  //             if (response.data.data[0].Success === 1) {
+  //               toast.success(response.data.data[0].Message);
+  //               history.push({
+  //                 pathname: "/courses/course-detail/assessment-tools",
+  //               });
+  //             }
 
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
-          },
-          (error) => {
-            toast.error(error);
-          }
-        );
-    }
-  };
+  //             if (response.data.data[0].Success === 0)
+  //               toast.error(response.data.data[0].Message);
+  //           },
+  //           (error) => {
+  //             toast.error(error);
+  //           }
+  //         );
+  //     }
+  //   };
 
   const handleCancel = () => {
     history.push({
@@ -178,7 +175,7 @@ const AddAssessmentTool = () => {
       <div className="add-background">
         <div className="container mt-4">
           <div className="add-center">
-            <h2>Add Assessment Tool</h2>
+            <h2>Delete Assessment Tool</h2>
             <form>
               <div className="add-txt-field">
                 <div>
@@ -223,7 +220,7 @@ const AddAssessmentTool = () => {
                   <label className="add-login-label">Course Type </label>
                   <br></br>
                   <input
-                    value={courseType}
+                    defaultValue={courseType}
                     disabled
                     id="courseCode"
                     name="courseCode"
@@ -234,59 +231,51 @@ const AddAssessmentTool = () => {
                   <br></br>
                   <input
                     defaultValue={location.state.sectionName}
+                    disabled
                     id="sectionName"
                     name="sectionName"
                     className="add-txt-field-input"
-                    placeholder="B"
                   />
                   <br></br>
                   <label className="add-login-label">Tool Type</label>
                   <br></br>
                   <input
-                    value={toolType}
-                    required
-                    placeholder="Sessional / Final"
+                    defaultValue={location.state.toolType}
+                    disabled
                     id="toolType"
                     name="toolType"
                     className="add-txt-field-input"
-                    onChange={(e) => setToolType(e.target.value)}
                   />
                   <br></br>
 
                   <label className="add-login-label">Tool Name</label>
                   <br></br>
                   <input
-                    value={toolName}
-                    required
+                    defaultValue={location.state.toolName}
+                    disabled
                     id="toolName"
                     name="toolName"
                     className="add-txt-field-input"
-                    placeholder="Quiz 01"
-                    onChange={(e) => setToolName(e.target.value)}
                   />
                   <br></br>
                   <label className="add-login-label">CLO Name</label>
                   <br></br>
                   <input
-                    value={cloName}
-                    required
-                    placeholder="CLO-01"
+                    defaultValue={location.state.cloName}
+                    disabled
                     id="cloName"
                     name="cloName"
                     className="add-txt-field-input"
-                    onChange={(e) => setCloName(e.target.value)}
                   />
                   <br></br>
                   <label className="add-login-label">Total Marks </label>
                   <br></br>
                   <input
-                    value={totalMarks}
-                    required
+                    defaultValue={location.state.totalMarks}
+                    disabled
                     id="totalMarks"
                     name="totalMarks"
                     className="add-txt-field-input"
-                    placeholder="09"
-                    onChange={(e) => setTotalMarks(e.target.value)}
                   />
                   <br></br>
                 </div>
@@ -296,9 +285,7 @@ const AddAssessmentTool = () => {
                   Cancel
                 </Button>{" "}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button onClick={handleAdd} className="dialog-button">
-                  Add
-                </Button>
+                <Button className="dialog-button">Delete</Button>
               </DialogActions>
             </form>
           </div>
@@ -308,4 +295,4 @@ const AddAssessmentTool = () => {
   );
 };
 
-export default AddAssessmentTool;
+export default DeleteAssessmentToolForm;

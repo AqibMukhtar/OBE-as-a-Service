@@ -8,6 +8,7 @@ const AssessmentToolsActions = () => {
   const location = useLocation();
   const history = useHistory();
 
+  //View Assessment Tool Button
   const handleViewAssessmentTool = () => {
     history.push({
       pathname: "/course/course-detail/assessment-tool/view-assessment-tool",
@@ -21,9 +22,44 @@ const AssessmentToolsActions = () => {
     });
   };
 
+  //Add Assessment Tool Button
   const handleAddAssessmentTool = () => {
     history.push({
       pathname: "/course/course-detail/assessment-tool/add-assessment-tool",
+      state: {
+        programId: location.state.programId,
+        batchId: location.state.batchId,
+        courseId: location.state.courseId,
+        courseName: location.state.courseName,
+        courseCode: location.state.courseCode,
+        sectionName: location.state.sectionName,
+        programName: location.state.programName,
+        isPractical: location.state.isPractical,
+      },
+    });
+  };
+
+  //Edit Assessment Tool Button
+  const handleEditAssessmentTool = () => {
+    history.push({
+      pathname: "/course/course-detail/assessment-tool/edit-assessment-tool",
+      state: {
+        programId: location.state.programId,
+        batchId: location.state.batchId,
+        courseId: location.state.courseId,
+        courseName: location.state.courseName,
+        courseCode: location.state.courseCode,
+        sectionName: location.state.sectionName,
+        programName: location.state.programName,
+        isPractical: location.state.isPractical,
+      },
+    });
+  };
+
+  //Delete Assessment Tool Button
+  const handleDeleteAssessmentTool = () => {
+    history.push({
+      pathname: "/course/course-detail/assessment-tool/delete-assessment-tool",
       state: {
         programId: location.state.programId,
         batchId: location.state.batchId,
@@ -58,10 +94,18 @@ const AssessmentToolsActions = () => {
         >
           Add Assessment Tool
         </button>
-        <button type="button" className="course-btn">
+        <button
+          type="button"
+          className="course-btn"
+          onClick={handleEditAssessmentTool}
+        >
           Edit Assessment Tools
         </button>
-        <button type="button" className="course-btn">
+        <button
+          type="button"
+          className="course-btn"
+          onClick={handleDeleteAssessmentTool}
+        >
           Delete Assessment Tool
         </button>
       </div>

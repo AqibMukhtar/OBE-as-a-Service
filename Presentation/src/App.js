@@ -9,8 +9,12 @@ import CourseClo from "./components/courseClo";
 import AssessmentToolsActions from "./components/assessmentToolsActions";
 import ViewAssessmentTool from "./components/viewAssessmentTool";
 import AddAssessmentTool from "./components/addAssessmentTool";
+import EditAssessmentTool from "./components/editAssessmentToolList";
+import DeleteAssessmentTool from "./components/deleteAssessmentToolList";
+import DeleteAssessmentToolForm from "./components/deleteAssessmentToolForm";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import EditAssessmentToolForm from "./components/editAssessmentToolForm";
 
 function App() {
   return (
@@ -35,6 +39,22 @@ function App() {
           <Route
             path="/course/course-detail/assessment-tool/add-assessment-tool"
             component={AddAssessmentTool}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/edit-assessment-tool"
+            component={EditAssessmentTool}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/delete-assessment-tool"
+            component={DeleteAssessmentTool}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/delete-assessment-tool-form"
+            component={DeleteAssessmentToolForm}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/edit-assessment-tool-form"
+            component={EditAssessmentToolForm}
           />
         </Switch>
       </div>
