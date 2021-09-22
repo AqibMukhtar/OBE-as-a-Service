@@ -29,11 +29,7 @@ const TeacherCourse = () => {
   };
 
   const handleOnClick = (courseData) => {
-    console.log("this is handle on click");
-    console.log(courseData);
     setSelectedCourses(courseData);
-    console.log("this is selected courses");
-    console.log(selectedCourses);
   };
 
   const nextPage = () => {

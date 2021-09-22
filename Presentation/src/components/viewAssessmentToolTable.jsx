@@ -59,6 +59,7 @@ const ViewAssessmentToolTable = (props) => {
                 <StyledTableCell align="center">CLO Name</StyledTableCell>
                 <StyledTableCell align="center">Section Name</StyledTableCell>
                 <StyledTableCell align="center">Total Marks</StyledTableCell>
+                <StyledTableCell align="center">Type</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -75,6 +76,7 @@ const ViewAssessmentToolTable = (props) => {
                   <StyledTableCell align="center">
                     {tool.totalMarks}
                   </StyledTableCell>
+                  <StyledTableCell align="center">{tool.Type}</StyledTableCell>
                   <StyledTableCell align="center">
                     {tool.isConducted == "0" ? "Not Conducted" : "Conducted"}
                   </StyledTableCell>
