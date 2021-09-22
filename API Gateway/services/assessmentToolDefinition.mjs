@@ -11,6 +11,11 @@ assessmentToolDefinition.post('/teacher/sessional/practical/', authorize, postPr
 assessmentToolDefinition.post('/teacher/final/theory/', authorize, postProxyRequest);
 assessmentToolDefinition.post('/teacher/final/practical/', authorize, postProxyRequest);
 
+assessmentToolDefinition.post('/teacher/update/sessional/theory/', authorize, postProxyRequest);
+assessmentToolDefinition.post('/teacher/update/sessional/practical/', authorize, postProxyRequest);
+assessmentToolDefinition.post('/teacher/update/final/theory/', authorize, postProxyRequest);
+assessmentToolDefinition.post('/teacher/update/final/practical/', authorize, postProxyRequest);
+
 assessmentToolDefinition.all('*', (req, res) => res.sendStatus(404));
 
 export default assessmentToolDefinition;

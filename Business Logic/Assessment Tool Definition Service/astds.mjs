@@ -56,6 +56,43 @@ app.post('/api/assessment_tool_definition/teacher/final/practical/', (req, res) 
   (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
 });
 
+
+app.post('/api/assessment_tool_definition/teacher/update/sessional/theory/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks
+  }} = req.body;
+  db.query('CALL updateAssessmentToolSessionalTheory(?,?,?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/update/sessional/practical/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks
+  }} = req.body;
+  db.query('CALL updateAssessmentToolSessionalPractical(?,?,?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/update/final/theory/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks
+  }} = req.body;
+  db.query('CALL updateAssessmentToolFinalTheory(?,?,?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/update/final/practical/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks
+  }} = req.body;
+  db.query('CALL updateAssessmentToolFinalPractical(?,?,?,?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, newToolName, cloName, newCloName, totalMarks],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
 app.listen(port, () => {
   console.log('Assessment Tool Definition Service is running on port:', port);
 });
