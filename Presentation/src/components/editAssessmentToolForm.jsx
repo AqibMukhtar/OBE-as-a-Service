@@ -10,15 +10,14 @@ import "./css/addAssessmentTool.css";
 const getTokken = localStorage.getItem("token");
 
 const EditAssessmentToolForm = () => {
-  const [courseType, setCourseType] = useState("");
-  const [newToolName, setnewToolName] = useState("");
-  const [newCloName, setNewCloName] = useState("");
-  const [newTotalMarks, setNewTotalMarks] = useState();
   const location = useLocation();
   const history = useHistory();
   const handle = location.state.isPractical;
-  console.log(handle);
-
+  const [courseType, setCourseType] = useState("");
+  const [newToolName, setnewToolName] = useState(location.state.toolName);
+  const [newCloName, setNewCloName] = useState(location.state.cloName);
+  const [totalMarks, setTotalMarks] = useState(location.state.totalMarks);
+  const toolType = location.state.toolType;
   //Header to be send through post request
   let axiosHeader = {
     headers: {
@@ -37,127 +36,126 @@ const EditAssessmentToolForm = () => {
     newToolName,
     cloName: location.state.cloName,
     newCloName,
-    totalMarks: location.state.totalMarks,
-    newTotalMarks,
+    totalMarks,
   };
 
   //Post Request
-  //   const handleDelete = () => {
-  //     if (
-  //       (toolType === "sessional" ||
-  //         toolType === "Sessional" ||
-  //         toolType === "SESSIONAL") &&
-  //       handle === 0
-  //     ) {
-  //       axios
-  //         .post(
-  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/sessional/theory/",
-  //           data,
-  //           axiosHeader
-  //         )
-  //         .then(
-  //           (response) => {
-  //             if (response.data.data[0].Success === 1) {
-  //               toast.success(response.data.data[0].Message);
-  //               history.push({
-  //                 pathname: "/courses/course-detail/assessment-tools",
-  //               });
-  //             }
+  const handleUpdate = () => {
+    if (
+      (toolType === "sessional" ||
+        toolType === "Sessional" ||
+        toolType === "SESSIONAL") &&
+      handle === 0
+    ) {
+      axios
+        .post(
+          "https://20.204.30.1/api/assessment_tool_definition/teacher/update/sessional/theory/",
+          data,
+          axiosHeader
+        )
+        .then(
+          (response) => {
+            if (response.data.data[0].Success === 1) {
+              toast.success(response.data.data[0].Message);
+              history.push({
+                pathname: "/courses/course-detail/assessment-tools",
+              });
+            }
 
-  //             if (response.data.data[0].Success === 0)
-  //               toast.error(response.data.data[0].Message);
-  //           },
-  //           (error) => {
-  //             toast.error(error);
-  //           }
-  //         );
-  //     }
-  //     if (
-  //       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-  //       handle === 0
-  //     ) {
-  //       axios
-  //         .post(
-  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/final/theory/",
-  //           data,
-  //           axiosHeader
-  //         )
-  //         .then(
-  //           (response) => {
-  //             if (response.data.data[0].Success === 1) {
-  //               toast.success(response.data.data[0].Message);
-  //               history.push({
-  //                 pathname: "/courses/course-detail/assessment-tools",
-  //               });
-  //             }
+            if (response.data.data[0].Success === 0)
+              toast.error(response.data.data[0].Message);
+          },
+          (error) => {
+            toast.error(error);
+          }
+        );
+    }
+    if (
+      (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
+      handle === 0
+    ) {
+      axios
+        .post(
+          "https://20.204.30.1/api/assessment_tool_definition/teacher/update/final/theory/",
+          data,
+          axiosHeader
+        )
+        .then(
+          (response) => {
+            if (response.data.data[0].Success === 1) {
+              toast.success(response.data.data[0].Message);
+              history.push({
+                pathname: "/courses/course-detail/assessment-tools",
+              });
+            }
 
-  //             if (response.data.data[0].Success === 0)
-  //               toast.error(response.data.data[0].Message);
-  //           },
-  //           (error) => {
-  //             toast.error(error);
-  //           }
-  //         );
-  //     }
+            if (response.data.data[0].Success === 0)
+              toast.error(response.data.data[0].Message);
+          },
+          (error) => {
+            toast.error(error);
+          }
+        );
+    }
 
-  //     if (
-  //       (toolType === "sessional" ||
-  //         toolType === "Sessional" ||
-  //         toolType === "SESSIONAL") &&
-  //       handle === 1
-  //     ) {
-  //       axios
-  //         .post(
-  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/sessional/practical/",
-  //           data,
-  //           axiosHeader
-  //         )
-  //         .then(
-  //           (response) => {
-  //             if (response.data.data[0].Success === 1) {
-  //               toast.success(response.data.data[0].Message);
-  //               history.push({
-  //                 pathname: "/courses/course-detail/assessment-tools",
-  //               });
-  //             }
+    if (
+      (toolType === "sessional" ||
+        toolType === "Sessional" ||
+        toolType === "SESSIONAL") &&
+      handle === 1
+    ) {
+      axios
+        .post(
+          "https://20.204.30.1/api/assessment_tool_definition/teacher/update/sessional/practical/",
+          data,
+          axiosHeader
+        )
+        .then(
+          (response) => {
+            if (response.data.data[0].Success === 1) {
+              toast.success(response.data.data[0].Message);
+              history.push({
+                pathname: "/courses/course-detail/assessment-tools",
+              });
+            }
 
-  //             if (response.data.data[0].Success === 0)
-  //               toast.error(response.data.data[0].Message);
-  //           },
-  //           (error) => {
-  //             toast.error(error);
-  //           }
-  //         );
-  //     }
+            if (response.data.data[0].Success === 0)
+              toast.error(response.data.data[0].Message);
+          },
+          (error) => {
+            toast.error(error);
+          }
+        );
+    }
 
-  //     if (
-  //       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-  //       handle === 1
-  //     ) {
-  //       axios
-  //         .post(
-  //           "https://20.204.30.1/api/assessment_tool_definition/teacher/final/practical/",
-  //           data,
-  //           axiosHeader
-  //         )
-  //         .then(
-  //           (response) => {
-  //             if (response.data.data[0].Success === 1) {
-  //               toast.success(response.data.data[0].Message);
-  //               history.push({
-  //                 pathname: "/courses/course-detail/assessment-tools",
-  //               });
-  //             }
+    if (
+      (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
+      handle === 1
+    ) {
+      axios
+        .post(
+          "https://20.204.30.1/api/assessment_tool_definition/teacher/update/final/practical/",
+          data,
+          axiosHeader
+        )
+        .then(
+          (response) => {
+            if (response.data.data[0].Success === 1) {
+              toast.success(response.data.data[0].Message);
+              history.push({
+                pathname: "/courses/course-detail/assessment-tools",
+              });
+            }
 
-  //             if (response.data.data[0].Success === 0)
-  //               toast.error(response.data.data[0].Message);
-  //           },
-  //           (error) => {
-  //             toast.error(error);
-  //           }
-  //         );
-  //     }
-  //   };
+            if (response.data.data[0].Success === 0)
+              toast.error(response.data.data[0].Message);
+          },
+          (error) => {
+            toast.error(error);
+          }
+        );
+    }
+  };
 
   const handleCancel = () => {
     history.push({
@@ -301,25 +299,14 @@ const EditAssessmentToolForm = () => {
                   <label className="add-login-label">Total Marks </label>
                   <br></br>
                   <input
-                    defaultValue={location.state.totalMarks}
-                    disabled
+                    value={totalMarks}
                     id="totalMarks"
                     name="totalMarks"
                     className="add-txt-field-input"
+                    onChange={(e) => setTotalMarks(e.target.value)}
                   />
                   <br></br>
-                  <label className="add-login-label">New Total Marks </label>
-                  <br></br>
-                  <input
-                    value={newTotalMarks}
-                    required
-                    id="newTotalMarks"
-                    name="newTotalMarks"
-                    className="add-txt-field-input"
-                    placeholder="04"
-                    onChange={(e) => setNewTotalMarks(e.target.value)}
-                  />
-                  <br></br>
+                  {console.log(totalMarks)}
                 </div>
               </div>
               <DialogActions>
@@ -327,7 +314,9 @@ const EditAssessmentToolForm = () => {
                   Cancel
                 </Button>{" "}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button className="dialog-button">Update</Button>
+                <Button className="dialog-button" onClick={handleUpdate}>
+                  Update
+                </Button>
               </DialogActions>
             </form>
           </div>

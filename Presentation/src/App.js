@@ -12,9 +12,9 @@ import AddAssessmentTool from "./components/addAssessmentTool";
 import EditAssessmentTool from "./components/editAssessmentToolList";
 import DeleteAssessmentTool from "./components/deleteAssessmentToolList";
 import DeleteAssessmentToolForm from "./components/deleteAssessmentToolForm";
+import EditAssessmentToolForm from "./components/editAssessmentToolForm";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import EditAssessmentToolForm from "./components/editAssessmentToolForm";
 
 function App() {
   return (
