@@ -93,6 +93,43 @@ app.post('/api/assessment_tool_definition/teacher/update/final/practical/', (req
   (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
 });
 
+
+app.post('/api/assessment_tool_definition/teacher/delete/sessional/theory/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName
+  }} = req.body;
+  db.query('CALL deleteAssessmentToolSessionalTheory(?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/delete/sessional/practical/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName
+  }} = req.body;
+  db.query('CALL deleteAssessmentToolSessionalPractical(?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/delete/final/theory/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName
+  }} = req.body;
+  db.query('CALL deleteAssessmentToolFinalTheory(?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
+app.post('/api/assessment_tool_definition/teacher/delete/final/practical/', (req, res) => {
+  const { user : {uid : teacherId}, formData : {
+    programName, batchId, courseName, courseCode, sectionName, toolName, cloName
+  }} = req.body;
+  db.query('CALL deleteAssessmentToolFinalPractical(?,?,?,?,?,?,?,?)', 
+  [programName, batchId, teacherId, courseName, courseCode, sectionName, toolName, cloName],
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+});
+
 app.listen(port, () => {
   console.log('Assessment Tool Definition Service is running on port:', port);
 });
