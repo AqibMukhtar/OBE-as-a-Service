@@ -141,6 +141,38 @@ const configurationData = {
         {
           name: '/api/assessment_tool_definition/teacher/final/practical/',
           authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/update/sessional/theory/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/update/sessional/practical/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/update/final/theory/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/update/final/practical/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/delete/sessional/theory/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/delete/sessional/practical/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/delete/final/theory/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/delete/final/practical/',
+          authUsers: [1]
         }
         
       ]
