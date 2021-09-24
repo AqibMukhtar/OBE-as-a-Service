@@ -13,6 +13,8 @@ import EditAssessmentTool from "./components/editAssessmentToolList";
 import DeleteAssessmentTool from "./components/deleteAssessmentToolList";
 import DeleteAssessmentToolForm from "./components/deleteAssessmentToolForm";
 import EditAssessmentToolForm from "./components/editAssessmentToolForm";
+import GradeAssessmentTool from "./components/gradeAssessmentToolList";
+import FutureUpgradeAlert from "./components/futureUpgradeAlert";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
@@ -55,6 +57,14 @@ function App() {
           <Route
             path="/course/course-detail/assessment-tool/edit-assessment-tool-form"
             component={EditAssessmentToolForm}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/grade-assessment-tool"
+            component={GradeAssessmentTool}
+          />
+          <Route
+            path="/course/course-detail/assessment-tool/grade-assessment-tools/grade"
+            component={FutureUpgradeAlert}
           />
         </Switch>
       </div>
