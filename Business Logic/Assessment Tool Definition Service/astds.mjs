@@ -134,11 +134,11 @@ app.post('/api/assessment_tool_definition/teacher/delete/final/practical/', (req
 app.post('/api/assessment_tool_definition/teacher/mark_conducted/', (req, res) => {
   const {formData : {type, toolId}} = req.body;
   switch(type) {
-    case 'final':
+    case 'Final':
       db.query('CALL markFinalToolConducted(?)', [toolId],
       (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
       break;
-    case 'sessional':
+    case 'Sessional':
       db.query('CALL markSessionalToolConducted(?)', [toolId],
       (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
       break;
