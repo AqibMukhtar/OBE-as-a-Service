@@ -234,6 +234,7 @@ const AddAssessmentTool = () => {
                   <br></br>
                   <input
                     defaultValue={location.state.sectionName}
+                    disabled
                     id="sectionName"
                     name="sectionName"
                     className="add-txt-field-input"
@@ -296,7 +297,11 @@ const AddAssessmentTool = () => {
                   Cancel
                 </Button>{" "}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button onClick={handleAdd} className="dialog-button">
+                <Button
+                  disabled={!toolType || !toolName || !cloName || !totalMarks}
+                  onClick={handleAdd}
+                  className="dialog-button"
+                >
                   Add
                 </Button>
               </DialogActions>

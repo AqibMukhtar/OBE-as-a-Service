@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import "./css/footer.css";
 
 class Footer extends Component {
@@ -36,30 +35,36 @@ class Footer extends Component {
           </div>
           <div className="below-side">
             <span>
-              <Link to="/login">
+              <a
+                href="https://web.facebook.com/NEDUETOfficial/?_rdc=1&_rdr"
+                target="_blank"
+              >
                 <i className="fa fa-facebook i-element" aria-hidden="true" />
-              </Link>
-              <Link>
+              </a>
+              <a href="https://www.neduet.edu.pk/contact-us" target="_blank">
                 <i
                   className="fa fa-map-marker i-element"
                   aria-hidden="true"
                 ></i>
-              </Link>
-              <Link>
+              </a>
+              <a
+                href="https://www.neduet.edu.pk/institutional_policies"
+                target="_blank"
+              >
                 <i className="fa fa-book i-element" aria-hidden="true"></i>
-              </Link>
-              <Link>
+              </a>
+              <a href="https://mail2.neduet.edu.pk/" target="_blank">
                 <i
                   className="fa fa-envelope-o i-element"
                   aria-hidden="true"
                 ></i>
-              </Link>
-              <Link>
+              </a>
+              <a href="https://www.neduet.edu.pk/contact-us" target="_blank">
                 <i className="fa fa-phone i-element" aria-hidden="true"></i>
-              </Link>
-              <Link>
+              </a>
+              <a href="https://www.neduet.edu.pk/" target="_blank">
                 <i className="fa fa-home i-element" aria-hidden="true"></i>
-              </Link>
+              </a>
             </span>
           </div>
         </div>

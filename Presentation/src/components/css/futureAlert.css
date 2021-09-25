@@ -1,0 +1,28 @@
+.future-background {
+  /* background-image: linear-gradient(
+    to right,
+    rgb(101, 145, 182),
+    rgb(161, 161, 136)
+  ) !important; */
+  background-image: url(future-alert2.jpg);
+}
+
+#alert-dialog-description {
+  color: rgb(31, 31, 63) !important;
+  font-style: bold !important;
+  font-weight: 400 !important;
+}
+
+.future-button {
+  color: #4472c4 !important;
+  font-weight: bold !important;
+  background-color: #e4e4e4 !important;
+  margin-bottom: 10px !important;
+  margin-right: 20px !important;
+}
+
+#alert-dialog-title {
+  color: #4472c4 !important;
+  font-style: bold !important;
+  font-weight: 500 !important;
+}

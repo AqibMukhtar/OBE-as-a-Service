@@ -31,7 +31,7 @@ const ViewAssessmentTool = () => {
 
   useEffect(() => {
     getAssessmentToolData();
-  });
+  }, []);
 
   return (
     <div>

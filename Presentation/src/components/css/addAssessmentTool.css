@@ -62,3 +62,13 @@ form .add-txt-field {
   border: none;
   border-bottom: 2px solid lightgrey;
 }
+
+Button:disabled {
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}
+
+input:disabled {
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}

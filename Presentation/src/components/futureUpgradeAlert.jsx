@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import { Button } from "@material-ui/core";
 import { Dialog } from "@material-ui/core";
 import { DialogContent } from "@material-ui/core";
 import { DialogActions } from "@material-ui/core";
 import { DialogContentText } from "@material-ui/core";
 import { DialogTitle } from "@material-ui/core";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
+import "./css/futureAlert.css";
 
 const FutureUpgradeAlert = () => {
   const [open, setOpen] = React.useState(true);
@@ -17,26 +20,24 @@ const FutureUpgradeAlert = () => {
     });
   };
   return (
-    <div>
+    <div className="future-background">
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        className="future-background"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Remember !"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending
-            anonymous location data to Google, even when no apps are running.
+            Selected assessment tool is marked as conducted. The feature to
+            grade students is in progress
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose} autoFocus>
-            Agree
+          <Button onClick={handleClose} className="future-button">
+            Okay
           </Button>
         </DialogActions>
       </Dialog>

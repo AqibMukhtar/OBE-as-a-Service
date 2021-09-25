@@ -53,24 +53,24 @@ const EditAssessmentToolForm = () => {
           data,
           axiosHeader
         )
-        .then(
-          (response) => {
+        .then((response) => {
+          try {
             if (response.data.data[0].Success === 1) {
               toast.success(response.data.data[0].Message);
               history.push({
                 pathname: "/courses/course-detail/assessment-tools",
               });
-            }
-
-            if (response.data.data[0].Success === 0)
+            } else if (response.data.data[0].Success === 0) {
               toast.error(response.data.data[0].Message);
-          },
-          (error) => {
-            toast.error(error);
+            }
+          } catch (ex) {
+            toast.error("Invalid Request");
           }
-        );
-    }
-    if (
+        });
+      // .catch((error) => {
+      //   toast.error(error);
+      // });
+    } else if (
       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
       handle === 0
     ) {
@@ -82,23 +82,24 @@ const EditAssessmentToolForm = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid Request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
           }
         );
-    }
-
-    if (
+    } else if (
       (toolType === "sessional" ||
         toolType === "Sessional" ||
         toolType === "SESSIONAL") &&
@@ -112,23 +113,24 @@ const EditAssessmentToolForm = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid Request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
           }
         );
-    }
-
-    if (
+    } else if (
       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
       handle === 1
     ) {
@@ -140,15 +142,18 @@ const EditAssessmentToolForm = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid Request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
@@ -268,10 +273,11 @@ const EditAssessmentToolForm = () => {
                     value={newToolName}
                     id="newToolName"
                     name="newToolName"
+                    pattern="[A-Z][a-z]{3,}\s(?!00)[0-9]{2}"
                     className="add-txt-field-input"
                     placeholder="Assignment 02"
                     onChange={(e) => setnewToolName(e.target.value)}
-                    required
+                    required="required"
                   />
                   <br></br>
                   <label className="add-login-label">CLO Name</label>
@@ -290,10 +296,12 @@ const EditAssessmentToolForm = () => {
                     value={newCloName}
                     id="newCloName"
                     name="newCloName"
+                    pattern="CLO-[\d]{2}"
+                    // title="CLO Name should match with required format"
                     className="add-txt-field-input"
                     placeholder="CLO-02"
                     onChange={(e) => setNewCloName(e.target.value)}
-                    required
+                    required=""
                   />
                   <br></br>
                   <label className="add-login-label">Total Marks </label>
@@ -303,10 +311,10 @@ const EditAssessmentToolForm = () => {
                     id="totalMarks"
                     name="totalMarks"
                     pattern="^(?!00)[0-9]{2}$"
-                    title="Total marks cannot be negative"
+                    // title="Total marks cannot be negative"
                     className="add-txt-field-input"
                     onChange={(e) => setTotalMarks(e.target.value)}
-                    required
+                    required="required"
                   />
                   <br></br>
                   {console.log(totalMarks)}
@@ -317,7 +325,12 @@ const EditAssessmentToolForm = () => {
                   Cancel
                 </Button>{" "}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button className="dialog-button" onClick={handleUpdate}>
+                <Button
+                  className="dialog-button"
+                  type="submit"
+                  disabled={!newCloName || !totalMarks || !newToolName}
+                  onClick={handleUpdate}
+                >
                   Update
                 </Button>
               </DialogActions>

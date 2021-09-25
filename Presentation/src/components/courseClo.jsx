@@ -28,7 +28,7 @@ const CourseClo = () => {
 
   useEffect(() => {
     getCloData();
-  });
+  }, []);
 
   console.log(cloBulkData);
   return (

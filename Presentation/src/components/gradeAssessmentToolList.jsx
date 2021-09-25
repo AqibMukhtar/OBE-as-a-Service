@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import axios from "axios";
-
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -15,6 +14,7 @@ import Footer from "./footer";
 import { Button } from "@material-ui/core";
 import "./css/gradeButton.css";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 
 const getTokken = localStorage.getItem("token");
 
@@ -74,22 +74,47 @@ const GradeAssessmentTool = () => {
 
   useEffect(() => {
     getAssessmentToolData();
-  });
+  }, []);
 
+  //Filtering
   for (let i = 0; i < assessmentToolBulkData.length; i++) {
     if (assessmentToolBulkData[i].isConducted === 0) {
       notConductedAssessmentTools.push(assessmentToolBulkData[i]);
     }
   }
 
-  const handleGrade = () => {
+  //Header to be send through post request
+  let axiosHeader = {
+    headers: {
+      "X-Access-Token": getTokken,
+    },
+  };
+
+  const handleGrade = (a, b) => {
+    //Date to be send through post request
+    const data = {
+      toolId: a,
+      type: b,
+    };
+
+    // axios
+    //   .post(
+    //     "https://20.204.30.1/api/assessment_tool_definition/teacher/mark_conducted/",
+    //     data,
+    //     axiosHeader
+    //   )
+    //   .then(
+    //     (response) => {
+    //       console.log(response.data.Message);
+    //     },
+    //     (error) => {
+    //       toast.error(error);
+    //     }
+    //   );
+
     history.push({
       pathname:
         "/course/course-detail/assessment-tool/grade-assessment-tools/grade",
-      state: {
-        courseName: location.state.courseName,
-        courseCode: location.state.courseCode,
-      },
     });
   };
 
@@ -132,7 +157,10 @@ const GradeAssessmentTool = () => {
                     {tool.isConducted == "0" ? "Not Conducted" : "Conducted"}{" "}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <Button className="grade-button" onClick={handleGrade}>
+                    <Button
+                      className="grade-button"
+                      onClick={() => handleGrade(tool.toolId, tool.Type)}
+                    >
                       Mark as Conducted
                     </Button>
                   </StyledTableCell>

@@ -9,24 +9,31 @@ const RealNavbar = (props) => {
       <div className="topDiv">
         <div className="setMargin">
           <span className="spanMargin">
-            <Link to="/login">
+            <a
+              href="https://web.facebook.com/NEDUETOfficial/?_rdc=1&_rdr"
+              target="_blank"
+            >
               <i className="fa fa-facebook" aria-hidden="true" />
-            </Link>
-            <Link>
+            </a>
+
+            <a href="https://www.neduet.edu.pk/contact-us" target="_blank">
               <i className="fa fa-map-marker" aria-hidden="true"></i>
-            </Link>
-            <Link>
+            </a>
+            <a
+              href="https://www.neduet.edu.pk/institutional_policies"
+              target="_blank"
+            >
               <i className="fa fa-book" aria-hidden="true"></i>
-            </Link>
-            <Link>
+            </a>
+            <a href="https://mail2.neduet.edu.pk/" target="_blank">
               <i className="fa fa-envelope-o" aria-hidden="true"></i>
-            </Link>
-            <Link>
+            </a>
+            <a href="https://www.neduet.edu.pk/contact-us" target="_blank">
               <i className="fa fa-phone" aria-hidden="true"></i>
-            </Link>
-            <Link>
+            </a>
+            <a href="https://www.neduet.edu.pk/" target="_blank">
               <i className="fa fa-home" aria-hidden="true"></i>
-            </Link>
+            </a>
           </span>
         </div>
       </div>
