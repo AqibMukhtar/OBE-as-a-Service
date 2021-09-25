@@ -15,6 +15,13 @@ import DeleteAssessmentToolForm from "./components/deleteAssessmentToolForm";
 import EditAssessmentToolForm from "./components/editAssessmentToolForm";
 import GradeAssessmentTool from "./components/gradeAssessmentToolList";
 import FutureUpgradeAlert from "./components/futureUpgradeAlert";
+import OBEcellActions from "./components/obeCellActions";
+import AddCLO from "./components/addClo";
+import UpdateCLO from "./components/updateClo";
+import DeleteCLO from "./components/deleteClo";
+import PEODescription from "./components/peoDescription";
+import PLODescription from "./components/ploDescription";
+import Admin from "./components/admin";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
@@ -66,6 +73,13 @@ function App() {
             path="/course/course-detail/assessment-tool/grade-assessment-tools/grade"
             component={FutureUpgradeAlert}
           />
+          <Route path="/peo" component={PEODescription} />
+          <Route path="/plo" component={PLODescription} />
+          <Route path="/obe-cell" component={OBEcellActions} />
+          <Route path="/add-clo" component={AddCLO} />
+          <Route path="/update-clo" component={UpdateCLO} />
+          <Route path="/delete-clo" component={DeleteCLO} />
+          <Route path="/admin" component={Admin} />
         </Switch>
       </div>
     </React.Fragment>

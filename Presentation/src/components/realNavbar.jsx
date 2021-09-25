@@ -59,12 +59,12 @@ const RealNavbar = (props) => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/login">
+                <Link className="nav-link" to="/peo">
                   PEOs
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/login">
+                <Link className="nav-link" to="/plo">
                   PLOs
                 </Link>
               </li>
@@ -79,10 +79,6 @@ const RealNavbar = (props) => {
           </div>
         </div>
       </nav>
-      {/* <div className="container mt-4">
-        <TeacherCourse />
-      </div> */}
-      {/* <Footer /> */}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-// import jwtDecode from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import http from "./httpService";
 import { apiUrl } from "../config.json";
 
@@ -18,14 +18,14 @@ export function logout() {
   localStorage.removeItem(tokenKey);
 }
 
-// export function getCurrentUser() {
-//   try {
-//     const jwt = localStorage.getItem(tokenKey);
-//     return jwtDecode(jwt);
-//   } catch (ex) {
-//     return null;
-//   }
-// }
+export function getCurrentUser() {
+  try {
+    const jwt = localStorage.getItem(tokenKey);
+    return jwtDecode(jwt);
+  } catch (ex) {
+    return null;
+  }
+}
 
 export default {
   login,

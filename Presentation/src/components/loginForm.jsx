@@ -5,7 +5,7 @@ import axios from "axios";
 import Joi from "joi-browser";
 import Form from "./form";
 import Input from "./input";
-import auth from "../services/authService";
+import auth, { getCurrentUser } from "../services/authService";
 import LoginFormNavbar from "./loginFormNavbar";
 import "./css/loginform.css";
 
@@ -30,6 +30,9 @@ class LoginForm extends Form {
 
   componentDidMount() {
     const setProps = this.props;
+    // const currentUser = getCurrentUser();
+    // console.log("i am current user");
+    // console.log(currentUser);
     async function submit(props) {
       let user = localStorage.getItem("token");
       function setJwt(user) {
@@ -76,8 +79,18 @@ class LoginForm extends Form {
       if (Object.keys(jwt.data).length == 0)
         toast.error("Invalid username or password");
       else {
-        localStorage.setItem("token", jwt.data);
-        this.props.history.push("/courses");
+        if (selectedOption.value === "teacher") {
+          localStorage.setItem("token", jwt.data);
+          this.props.history.push("/courses");
+        }
+        if (selectedOption.value === "obecell") {
+          localStorage.setItem("token", jwt.data);
+          this.props.history.push("/obe-cell");
+        }
+        if (selectedOption.value === "admin") {
+          localStorage.setItem("token", jwt.data);
+          this.props.history.push("/admin");
+        }
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {

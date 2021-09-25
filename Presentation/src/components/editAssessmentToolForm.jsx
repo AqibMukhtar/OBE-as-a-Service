@@ -266,12 +266,12 @@ const EditAssessmentToolForm = () => {
                   <br></br>
                   <input
                     value={newToolName}
-                    required
                     id="newToolName"
                     name="newToolName"
                     className="add-txt-field-input"
                     placeholder="Assignment 02"
                     onChange={(e) => setnewToolName(e.target.value)}
+                    required
                   />
                   <br></br>
                   <label className="add-login-label">CLO Name</label>
@@ -288,12 +288,12 @@ const EditAssessmentToolForm = () => {
                   <br></br>
                   <input
                     value={newCloName}
-                    required
                     id="newCloName"
                     name="newCloName"
                     className="add-txt-field-input"
                     placeholder="CLO-02"
                     onChange={(e) => setNewCloName(e.target.value)}
+                    required
                   />
                   <br></br>
                   <label className="add-login-label">Total Marks </label>
@@ -302,8 +302,11 @@ const EditAssessmentToolForm = () => {
                     value={totalMarks}
                     id="totalMarks"
                     name="totalMarks"
+                    pattern="^(?!00)[0-9]{2}$"
+                    title="Total marks cannot be negative"
                     className="add-txt-field-input"
                     onChange={(e) => setTotalMarks(e.target.value)}
+                    required
                   />
                   <br></br>
                   {console.log(totalMarks)}
