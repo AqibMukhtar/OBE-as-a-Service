@@ -21,6 +21,8 @@ assessmentToolDefinition.post('/teacher/delete/sessional/practical/', authorize,
 assessmentToolDefinition.post('/teacher/delete/final/theory/', authorize, postProxyRequest);
 assessmentToolDefinition.post('/teacher/delete/final/practical/', authorize, postProxyRequest);
 
+assessmentToolDefinition.post('/teacher/mark_conducted/', authorize, postProxyRequest);
+
 assessmentToolDefinition.all('*', (req, res) => res.sendStatus(404));
 
 export default assessmentToolDefinition;

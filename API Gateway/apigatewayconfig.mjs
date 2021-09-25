@@ -173,6 +173,10 @@ const configurationData = {
         {
           name: '/api/assessment_tool_definition/teacher/delete/final/practical/',
           authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/mark_conducted/',
+          authUsers: [1]
         }
         
       ]
