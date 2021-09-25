@@ -22,10 +22,19 @@ function authenticatePassword(req, res, next) {
       const { uid, pid, tid } = jwt.verify(token, getJWTSecret());
       res.send({
         loggedIn: true,
-        data: jwt.sign({ uid, pid, tid }, getJWTSecret())
+        data: {
+          "token" :jwt.sign({ uid, pid, tid }, getJWTSecret()),
+          "user" : getUserByTid(tid)
+        }
       });
     } catch (err) {
       res.sendStatus(401);
     }
   }
+}
+
+function getUserByTid(tid) {
+  if(tid == 1) return "teacher";
+  else if(tid == 2) return "obecell";
+  else return "admin";
 }

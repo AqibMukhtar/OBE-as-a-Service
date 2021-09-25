@@ -1,11 +1,10 @@
-import { Router } from 'express';
-import { urlencoded } from 'express';
+import { Router, json } from 'express';
 import { putProxyRequest } from '../operations/proxiedRouting.mjs';
 import authorize from '../operations/authorization.mjs';
 
 const cloCommit = Router();
 
-cloCommit.use(urlencoded({extended:false}));
+cloCommit.use(json());
 
 cloCommit.put('/add_clo/:add_id', authorize, putProxyRequest);
 cloCommit.put('/update_clo/:update_id', authorize, putProxyRequest);
