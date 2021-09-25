@@ -118,6 +118,10 @@ const configurationData = {
         {
           name: '/api/cds/teacher/view_assessment_tools/',
           authUsers: [1]
+        },
+        {
+          name: '/api/cds/view_name/',
+          authUsers: [1, 2, 3, 4]
         }
       ]
     },
