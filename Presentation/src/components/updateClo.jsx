@@ -7,8 +7,6 @@ import { Button } from "@material-ui/core";
 import { DialogActions } from "@material-ui/core";
 import "./css/addAssessmentTool.css";
 
-const getTokken = localStorage.getItem("token");
-
 const UpdateCLO = () => {
   const history = useHistory();
   const [courseCode, setCourseCode] = useState("");
@@ -21,6 +19,7 @@ const UpdateCLO = () => {
   const [taxonomyLevelName, setTaxonomyLevelName] = useState("");
   const [description, setDescription] = useState("");
   const [editNotes, setEditNotes] = useState("");
+  const getTokken = localStorage.getItem("token");
 
   let axiosHeader = {
     headers: {

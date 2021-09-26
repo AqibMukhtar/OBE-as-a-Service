@@ -7,10 +7,9 @@ import { Button } from "@material-ui/core";
 import { DialogActions } from "@material-ui/core";
 import "./css/addAssessmentTool.css";
 
-const getTokken = localStorage.getItem("token");
-
 const DeleteCLO = () => {
   const history = useHistory();
+  const getTokken = localStorage.getItem("token");
   const [courseCode, setCourseCode] = useState("");
   const [courseName, setCourseName] = useState("");
   const [courseType, setCourseType] = useState("");
