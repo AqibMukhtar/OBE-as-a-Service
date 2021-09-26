@@ -21,7 +21,7 @@ import UpdateCLO from "./components/updateClo";
 import DeleteCLO from "./components/deleteClo";
 import PEODescription from "./components/peoDescription";
 import PLODescription from "./components/ploDescription";
-import Admin from "./components/admin";
+import AdminActions from "./components/adminActions";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
@@ -79,7 +79,7 @@ function App() {
           <Route path="/add-clo" component={AddCLO} />
           <Route path="/update-clo" component={UpdateCLO} />
           <Route path="/delete-clo" component={DeleteCLO} />
-          <Route path="/admin" component={Admin} />
+          <Route path="/admin" component={AdminActions} />
         </Switch>
       </div>
     </React.Fragment>

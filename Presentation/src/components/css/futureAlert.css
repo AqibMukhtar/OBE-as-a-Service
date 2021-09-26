@@ -4,7 +4,9 @@
     rgb(101, 145, 182),
     rgb(161, 161, 136)
   ) !important; */
-  background-image: url(future-alert2.jpg);
+  background-image: url(new-bg.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 #alert-dialog-description {
