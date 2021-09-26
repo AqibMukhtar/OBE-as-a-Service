@@ -17,7 +17,10 @@ const CourseClo = () => {
           "https://20.204.30.1/api/cds/view_course_clos?programId=" +
             location.state.programId +
             "&courseId=" +
-            location.state.courseId,
+            location.state.courseId +
+            "&batchId=" +
+            location.state.batchId,
+
           {
             headers: {
               "X-Access-Token": getTokken,
