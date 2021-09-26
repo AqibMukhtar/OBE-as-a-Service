@@ -45,7 +45,7 @@ const EditAssessmentToolForm = () => {
       (toolType === "sessional" ||
         toolType === "Sessional" ||
         toolType === "SESSIONAL") &&
-      handle === 0
+      location.state.isPractical === 0
     ) {
       axios
         .post(
@@ -53,26 +53,29 @@ const EditAssessmentToolForm = () => {
           data,
           axiosHeader
         )
-        .then((response) => {
-          try {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
-            } else if (response.data.data[0].Success === 0) {
-              toast.error(response.data.data[0].Message);
+        .then(
+          (response) => {
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid request");
             }
-          } catch (ex) {
-            toast.error("Invalid Request");
+          },
+          (error) => {
+            toast.error(error);
           }
-        });
-      // .catch((error) => {
-      //   toast.error(error);
-      // });
-    } else if (
+        );
+    }
+    if (
       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-      handle === 0
+      location.state.isPractical === 0
     ) {
       axios
         .post(
@@ -92,18 +95,20 @@ const EditAssessmentToolForm = () => {
                 toast.error(response.data.data[0].Message);
               }
             } catch (ex) {
-              toast.error("Invalid Request");
+              toast.error("Invalid request");
             }
           },
           (error) => {
             toast.error(error);
           }
         );
-    } else if (
+    }
+
+    if (
       (toolType === "sessional" ||
         toolType === "Sessional" ||
         toolType === "SESSIONAL") &&
-      handle === 1
+      location.state.isPractical === 1
     ) {
       axios
         .post(
@@ -123,16 +128,18 @@ const EditAssessmentToolForm = () => {
                 toast.error(response.data.data[0].Message);
               }
             } catch (ex) {
-              toast.error("Invalid Request");
+              toast.error("Invalid request");
             }
           },
           (error) => {
             toast.error(error);
           }
         );
-    } else if (
+    }
+
+    if (
       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-      handle === 1
+      location.state.isPractical === 1
     ) {
       axios
         .post(
@@ -152,7 +159,7 @@ const EditAssessmentToolForm = () => {
                 toast.error(response.data.data[0].Message);
               }
             } catch (ex) {
-              toast.error("Invalid Request");
+              toast.error("Invalid request");
             }
           },
           (error) => {
@@ -273,11 +280,9 @@ const EditAssessmentToolForm = () => {
                     value={newToolName}
                     id="newToolName"
                     name="newToolName"
-                    pattern="[A-Z][a-z]{3,}\s(?!00)[0-9]{2}"
                     className="add-txt-field-input"
                     placeholder="Assignment 02"
                     onChange={(e) => setnewToolName(e.target.value)}
-                    required="required"
                   />
                   <br></br>
                   <label className="add-login-label">CLO Name</label>
@@ -296,12 +301,9 @@ const EditAssessmentToolForm = () => {
                     value={newCloName}
                     id="newCloName"
                     name="newCloName"
-                    pattern="CLO-[\d]{2}"
-                    // title="CLO Name should match with required format"
                     className="add-txt-field-input"
                     placeholder="CLO-02"
                     onChange={(e) => setNewCloName(e.target.value)}
-                    required=""
                   />
                   <br></br>
                   <label className="add-login-label">Total Marks </label>
@@ -310,14 +312,10 @@ const EditAssessmentToolForm = () => {
                     value={totalMarks}
                     id="totalMarks"
                     name="totalMarks"
-                    pattern="^(?!00)[0-9]{2}$"
-                    // title="Total marks cannot be negative"
                     className="add-txt-field-input"
                     onChange={(e) => setTotalMarks(e.target.value)}
-                    required="required"
                   />
                   <br></br>
-                  {console.log(totalMarks)}
                 </div>
               </div>
               <DialogActions>
@@ -327,7 +325,6 @@ const EditAssessmentToolForm = () => {
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <Button
                   className="dialog-button"
-                  type="submit"
                   disabled={!newCloName || !totalMarks || !newToolName}
                   onClick={handleUpdate}
                 >

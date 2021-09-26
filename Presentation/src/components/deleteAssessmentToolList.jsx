@@ -67,7 +67,7 @@ const DeleteAssessmentTool = () => {
   };
   useEffect(() => {
     getAssessmentToolData();
-  });
+  }, []);
 
   return (
     <>

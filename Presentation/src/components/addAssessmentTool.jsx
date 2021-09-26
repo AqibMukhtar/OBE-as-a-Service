@@ -17,7 +17,7 @@ const AddAssessmentTool = () => {
   const [totalMarks, setTotalMarks] = useState();
   const location = useLocation();
   const history = useHistory();
-  const handle = location.state.isPractical;
+  // const handle = location.state.isPractical;
 
   //Header to be send through post request
   let axiosHeader = {
@@ -38,13 +38,15 @@ const AddAssessmentTool = () => {
     totalMarks,
   };
 
+  //Changes started
+
   //Post Request
   const handleAdd = () => {
     if (
       (toolType === "sessional" ||
         toolType === "Sessional" ||
         toolType === "SESSIONAL") &&
-      handle === 0
+      location.state.isPractical === 0
     ) {
       axios
         .post(
@@ -54,15 +56,18 @@ const AddAssessmentTool = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
@@ -71,7 +76,7 @@ const AddAssessmentTool = () => {
     }
     if (
       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-      handle === 0
+      location.state.isPractical === 0
     ) {
       axios
         .post(
@@ -81,15 +86,18 @@ const AddAssessmentTool = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
@@ -101,7 +109,7 @@ const AddAssessmentTool = () => {
       (toolType === "sessional" ||
         toolType === "Sessional" ||
         toolType === "SESSIONAL") &&
-      handle === 1
+      location.state.isPractical === 1
     ) {
       axios
         .post(
@@ -111,15 +119,18 @@ const AddAssessmentTool = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
@@ -129,7 +140,7 @@ const AddAssessmentTool = () => {
 
     if (
       (toolType === "final" || toolType === "Final" || toolType === "FINAL") &&
-      handle === 1
+      location.state.isPractical === 1
     ) {
       axios
         .post(
@@ -139,15 +150,18 @@ const AddAssessmentTool = () => {
         )
         .then(
           (response) => {
-            if (response.data.data[0].Success === 1) {
-              toast.success(response.data.data[0].Message);
-              history.push({
-                pathname: "/courses/course-detail/assessment-tools",
-              });
+            try {
+              if (response.data.data[0].Success === 1) {
+                toast.success(response.data.data[0].Message);
+                history.push({
+                  pathname: "/courses/course-detail/assessment-tools",
+                });
+              } else if (response.data.data[0].Success === 0) {
+                toast.error(response.data.data[0].Message);
+              }
+            } catch (ex) {
+              toast.error("Invalid request");
             }
-
-            if (response.data.data[0].Success === 0)
-              toast.error(response.data.data[0].Message);
           },
           (error) => {
             toast.error(error);
@@ -164,14 +178,16 @@ const AddAssessmentTool = () => {
 
   const handleCourseType = () => {
     {
-      handle === 1 ? setCourseType("Practical") : setCourseType("Theory");
+      location.state.isPractical === 1
+        ? setCourseType("Practical")
+        : setCourseType("Theory");
     }
     console.log(courseType);
   };
 
   useEffect(() => {
     handleCourseType();
-  }, [handle]);
+  });
 
   return (
     <>
@@ -272,6 +288,7 @@ const AddAssessmentTool = () => {
                     value={cloName}
                     required
                     placeholder="CLO-01"
+                    pattern="CLO-[\d]{2}"
                     id="cloName"
                     name="cloName"
                     className="add-txt-field-input"
@@ -285,6 +302,7 @@ const AddAssessmentTool = () => {
                     required
                     id="totalMarks"
                     name="totalMarks"
+                    pattern="^(?!00)[0-9]{2}$"
                     className="add-txt-field-input"
                     placeholder="09"
                     onChange={(e) => setTotalMarks(e.target.value)}

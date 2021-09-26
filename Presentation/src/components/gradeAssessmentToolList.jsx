@@ -97,20 +97,20 @@ const GradeAssessmentTool = () => {
       type: b,
     };
 
-    // axios
-    //   .post(
-    //     "https://20.204.30.1/api/assessment_tool_definition/teacher/mark_conducted/",
-    //     data,
-    //     axiosHeader
-    //   )
-    //   .then(
-    //     (response) => {
-    //       console.log(response.data.Message);
-    //     },
-    //     (error) => {
-    //       toast.error(error);
-    //     }
-    //   );
+    axios
+      .post(
+        "https://20.204.30.1/api/assessment_tool_definition/teacher/mark_conducted/",
+        data,
+        axiosHeader
+      )
+      .then(
+        (response) => {
+          console.log(response.data.Message);
+        },
+        (error) => {
+          toast.error(error);
+        }
+      );
 
     history.push({
       pathname:

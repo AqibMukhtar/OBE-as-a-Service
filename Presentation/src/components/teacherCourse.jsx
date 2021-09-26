@@ -22,7 +22,7 @@ const TeacherCourse = () => {
         }
       );
       setTeacherData(teacherBulkData.data.data);
-      // console.log(teacherData);
+      console.log(teacherData);
       setTeacherName(teacherData[0].teacherName);
       // console.log(teacherName);
     } catch (error) {}

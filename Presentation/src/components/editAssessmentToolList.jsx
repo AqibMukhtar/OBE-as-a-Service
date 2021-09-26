@@ -67,7 +67,7 @@ const EditAssessmentTool = () => {
   };
   useEffect(() => {
     getAssessmentToolData();
-  });
+  }, []);
 
   return (
     <>
