@@ -38,9 +38,6 @@ const AddAssessmentTool = () => {
     totalMarks,
   };
 
-  //Changes started
-
-  //Post Request
   const handleAdd = () => {
     if (
       (toolType === "sessional" ||
