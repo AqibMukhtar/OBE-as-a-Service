@@ -78,7 +78,8 @@ const TeacherCourse = () => {
             onClick={() => handleOnClick(courseData)}
           >
             {courseData.courseName} ({courseData.courseCode}) ( Section:{" "}
-            {courseData.sectionName})
+            {courseData.sectionName}){" "}
+            {courseData.isPractical === 0 ? "Theory" : "Practical"}
           </button>
         ))}
       </div>
