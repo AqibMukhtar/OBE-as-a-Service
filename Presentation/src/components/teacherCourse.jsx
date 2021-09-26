@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import RealNavbar from "./realNavbar";
+import Footer from "./footer";
 import axios from "axios";
 import "./css/teacherCourse.css";
-
-const getTokken = localStorage.getItem("token");
 
 const TeacherCourse = () => {
   const [teacherData, setTeacherData] = useState([]);
@@ -11,21 +12,27 @@ const TeacherCourse = () => {
   const [selectedCourses, setSelectedCourses] = useState([]);
   const history = useHistory();
 
+  const getTokken = localStorage.getItem("token");
+
   const getTeacherData = async () => {
     try {
-      const teacherBulkData = await axios.get(
-        "https://20.204.30.1/api/cds/teacher/view_teaching_course",
-        {
+      await axios
+        .get("https://20.204.30.1/api/cds/teacher/view_teaching_course", {
           headers: {
             "X-Access-Token": getTokken,
           },
-        }
-      );
-      setTeacherData(teacherBulkData.data.data);
-      console.log(teacherData);
-      setTeacherName(teacherData[0].teacherName);
-      console.log(teacherName);
-    } catch (error) {}
+        })
+        .then((response) => {
+          setTeacherData(response.data.data);
+          // setTeacherName(teacherData[0].teacherName);
+        });
+      // setTeacherData(teacherBulkData.data.data);
+      // console.log(teacherData);
+      // setTeacherName(teacherData[0].teacherName);
+      // console.log(teacherName);
+    } catch (ex) {
+      toast.error(ex);
+    }
   };
 
   const handleOnClick = (courseData) => {
@@ -49,11 +56,18 @@ const TeacherCourse = () => {
 
   useEffect(() => {
     getTeacherData();
-  }, [teacherData]);
+  }, []);
+
+  useEffect(() => {
+    if (teacherData.length != 0) {
+      setTeacherName(teacherData[0].teacherName);
+    }
+  });
 
   return (
     <>
-      <div>
+      <RealNavbar />
+      <div className="container mt-4">
         <h1 className="heading">{teacherName}</h1>
         <p className="para">You are teaching the following courses:</p>
 
@@ -68,6 +82,7 @@ const TeacherCourse = () => {
           </button>
         ))}
       </div>
+      <Footer />
     </>
   );
 };

@@ -5,7 +5,7 @@ import axios from "axios";
 import Joi from "joi-browser";
 import Form from "./form";
 import Input from "./input";
-import auth from "../services/authService";
+import auth, { getCurrentUser } from "../services/authService";
 import LoginFormNavbar from "./loginFormNavbar";
 import "./css/loginform.css";
 
@@ -31,27 +31,45 @@ class LoginForm extends Form {
   componentDidMount() {
     const setProps = this.props;
     async function submit(props) {
-      let user = localStorage.getItem("token");
-      function setJwt(user) {
-        axios.defaults.headers.common["X-Access-Token"] = user;
+      let currentUser = localStorage.getItem("token");
+      function setJwt(currentUser) {
+        axios.defaults.headers.common["X-Access-Token"] = currentUser;
         console.log("reqeust send");
       }
       try {
-        if (user) {
-          setJwt(user);
+        if (currentUser) {
+          setJwt(currentUser);
           const headerResponse = await auth.login({});
           console.log(headerResponse.data);
-          if (Object.keys(headerResponse.data).length == 0) {
+          if (Object.keys(headerResponse.data.token).length == 0) {
             toast.error("First Log in ");
             this.props.history.push("/login");
           } else {
-            setProps.history.push("/courses");
-            toast.error("You have already logged in");
-            localStorage.removeItem("token");
-            console.log("Previous Token Removed");
-            localStorage.setItem("token", headerResponse.data);
-            console.log("New Token Added in memory");
-            console.log(headerResponse);
+            if (headerResponse.data.user === "teacher") {
+              setProps.history.push("/courses");
+              toast.error("You have already logged in");
+              localStorage.removeItem("token");
+              console.log("Previous Token Removed");
+              localStorage.setItem("token", headerResponse.data.token);
+              console.log("New Token Added in memory");
+              console.log(headerResponse);
+            } else if (headerResponse.data.user === "obecell") {
+              setProps.history.push("/obe-cell");
+              toast.error("You have already logged in");
+              localStorage.removeItem("token");
+              console.log("Previous Token Removed");
+              localStorage.setItem("token", headerResponse.data.token);
+              console.log("New Token Added in memory");
+              console.log(headerResponse);
+            } else if (headerResponse.data.user === "admin") {
+              setProps.history.push("/admin");
+              toast.error("You have already logged in");
+              localStorage.removeItem("token");
+              console.log("Previous Token Removed");
+              localStorage.setItem("token", headerResponse.data.token);
+              console.log("New Token Added in memory");
+              console.log(headerResponse);
+            }
           }
         }
       } catch (ex) {
@@ -76,8 +94,18 @@ class LoginForm extends Form {
       if (Object.keys(jwt.data).length == 0)
         toast.error("Invalid username or password");
       else {
-        localStorage.setItem("token", jwt.data);
-        this.props.history.push("/courses");
+        if (selectedOption.value === "teacher") {
+          localStorage.setItem("token", jwt.data.token);
+          this.props.history.push("/courses");
+        }
+        if (selectedOption.value === "obecell") {
+          localStorage.setItem("token", jwt.data.token);
+          this.props.history.push("/obe-cell");
+        }
+        if (selectedOption.value === "admin") {
+          localStorage.setItem("token", jwt.data.token);
+          this.props.history.push("/admin");
+        }
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {

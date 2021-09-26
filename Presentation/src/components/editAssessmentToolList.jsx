@@ -1,36 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import axios from "axios";
+import { toast } from "react-toastify";
 import RealNavbar from "./realNavbar";
 import Footer from "./footer";
 import "./css/teacherCourse.css";
 
-const getTokken = localStorage.getItem("token");
-
 const EditAssessmentTool = () => {
   const history = useHistory();
   const location = useLocation();
+  const nonConductedAssessment = [];
   const [assessmentToolList, setAssessmentToolList] = useState([]);
   const [selectedAssessmentTool, setSelectedAssessmentTool] = useState([]);
+  const getTokken = localStorage.getItem("token");
 
   const getAssessmentToolData = async () => {
     try {
-      const AssessmentToolList = await axios.get(
-        "https://20.204.30.1/api/cds/teacher/view_assessment_tools/?courseId=" +
-          location.state.courseId +
-          "&batchId=" +
-          location.state.batchId +
-          "&programId=" +
-          location.state.programId,
-        {
-          headers: {
-            "X-Access-Token": getTokken,
-          },
-        }
-      );
-      setAssessmentToolList(AssessmentToolList.data.data);
-    } catch (error) {}
+      await axios
+        .get(
+          "https://20.204.30.1/api/cds/teacher/view_assessment_tools/?courseId=" +
+            location.state.courseId +
+            "&batchId=" +
+            location.state.batchId +
+            "&programId=" +
+            location.state.programId,
+          {
+            headers: {
+              "X-Access-Token": getTokken,
+            },
+          }
+        )
+        .then((response) => {
+          setAssessmentToolList(response.data.data);
+        });
+    } catch (error) {
+      toast.error(error);
+    }
   };
+
+  //Filtering
+  for (let i = 0; i < assessmentToolList.length; i++) {
+    if (assessmentToolList[i].isConducted === 0) {
+      nonConductedAssessment.push(assessmentToolList[i]);
+    }
+  }
 
   //When click on any assessment tool
   const handleEditButton = (toolData) => {
@@ -40,12 +53,10 @@ const EditAssessmentTool = () => {
   useEffect(() => {
     if (selectedAssessmentTool.length != 0) {
       afterSelectionNextForm();
-      console.log(selectedAssessmentTool);
     }
   }, [selectedAssessmentTool]);
 
   const afterSelectionNextForm = () => {
-    console.log(selectedAssessmentTool.toolName);
     history.push({
       pathname:
         "/course/course-detail/assessment-tool/edit-assessment-tool-form",
@@ -67,7 +78,7 @@ const EditAssessmentTool = () => {
   };
   useEffect(() => {
     getAssessmentToolData();
-  });
+  }, []);
 
   return (
     <>
@@ -79,7 +90,7 @@ const EditAssessmentTool = () => {
         <p className="para">
           You have defined the following assessment tools for this course:
         </p>
-        {assessmentToolList.map((toolData) => (
+        {nonConductedAssessment.map((toolData) => (
           <button
             type="button"
             className="course-btn"

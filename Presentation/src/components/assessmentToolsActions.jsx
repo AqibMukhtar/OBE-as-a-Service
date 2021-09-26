@@ -73,6 +73,23 @@ const AssessmentToolsActions = () => {
     });
   };
 
+  //Grade Assessment Tool Button
+  const gradeAssessmentTool = () => {
+    history.push({
+      pathname: "/course/course-detail/assessment-tool/grade-assessment-tool",
+      state: {
+        programId: location.state.programId,
+        batchId: location.state.batchId,
+        courseId: location.state.courseId,
+        courseName: location.state.courseName,
+        courseCode: location.state.courseCode,
+        sectionName: location.state.sectionName,
+        programName: location.state.programName,
+        isPractical: location.state.isPractical,
+      },
+    });
+  };
+
   return (
     <React.Fragment>
       <RealNavbar />
@@ -107,6 +124,13 @@ const AssessmentToolsActions = () => {
           onClick={handleDeleteAssessmentTool}
         >
           Delete Assessment Tool
+        </button>
+        <button
+          type="button"
+          className="course-btn"
+          onClick={gradeAssessmentTool}
+        >
+          Grade Assessment Tool
         </button>
       </div>
       <Footer />

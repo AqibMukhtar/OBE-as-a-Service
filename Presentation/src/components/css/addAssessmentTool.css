@@ -1,7 +1,13 @@
 .add-background {
   margin: 0;
   padding: 0;
-  background-color: #051a09;
+  /* background-color: #051a09; */
+  background-image: linear-gradient(
+    to left,
+    #051a09,
+    #505e75,
+    #0b2249
+  ) !important;
   height: 210vh;
 }
 
@@ -61,4 +67,20 @@ form .add-txt-field {
   opacity: 0.9;
   border: none;
   border-bottom: 2px solid lightgrey;
+}
+
+Button:disabled {
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}
+
+input:disabled {
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+  background-color: rgb(243, 235, 235) !important;
+  border-radius: 5px !important;
+}
+
+input {
+  border-radius: 5px !important;
 }

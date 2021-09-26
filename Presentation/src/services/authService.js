@@ -1,4 +1,4 @@
-// import jwtDecode from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import http from "./httpService";
 import { apiUrl } from "../config.json";
 
@@ -16,6 +16,8 @@ export async function login(userName, password, type) {
 
 export function logout() {
   localStorage.removeItem(tokenKey);
+  window.localStorage.clear();
+  window.location = "/";
 }
 
 // export function getCurrentUser() {
