@@ -122,6 +122,18 @@ const configurationData = {
         {
           name: '/api/cds/view_name/',
           authUsers: [1, 2, 3, 4]
+        },
+        {
+          name: '/api/cds/admin/uncommitted_clo_addition/',
+          authUsers: [3]
+        },
+        {
+          name: '/api/cds/admin/uncommitted_clo_updation/',
+          authUsers: [3]
+        },
+        {
+          name: '/api/cds/admin/uncommitted_clo_deletion/',
+          authUsers: [3]
         }
       ]
     },
