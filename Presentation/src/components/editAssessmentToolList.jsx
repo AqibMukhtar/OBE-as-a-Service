@@ -10,6 +10,7 @@ const getTokken = localStorage.getItem("token");
 const EditAssessmentTool = () => {
   const history = useHistory();
   const location = useLocation();
+  const nonConductedAssessment = [];
   const [assessmentToolList, setAssessmentToolList] = useState([]);
   const [selectedAssessmentTool, setSelectedAssessmentTool] = useState([]);
 
@@ -31,6 +32,13 @@ const EditAssessmentTool = () => {
       setAssessmentToolList(AssessmentToolList.data.data);
     } catch (error) {}
   };
+
+  //Filtering
+  for (let i = 0; i < assessmentToolList.length; i++) {
+    if (assessmentToolList[i].isConducted === 0) {
+      nonConductedAssessment.push(assessmentToolList[i]);
+    }
+  }
 
   //When click on any assessment tool
   const handleEditButton = (toolData) => {
@@ -79,7 +87,7 @@ const EditAssessmentTool = () => {
         <p className="para">
           You have defined the following assessment tools for this course:
         </p>
-        {assessmentToolList.map((toolData) => (
+        {nonConductedAssessment.map((toolData) => (
           <button
             type="button"
             className="course-btn"
