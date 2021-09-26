@@ -7,8 +7,6 @@ import { DialogActions } from "@material-ui/core";
 import { useHistory, useLocation } from "react-router";
 import "./css/addAssessmentTool.css";
 
-const getTokken = localStorage.getItem("token");
-
 const AddAssessmentTool = () => {
   const [courseType, setCourseType] = useState("");
   const [toolType, setToolType] = useState("");
@@ -17,6 +15,7 @@ const AddAssessmentTool = () => {
   const [totalMarks, setTotalMarks] = useState();
   const location = useLocation();
   const history = useHistory();
+  const getTokken = localStorage.getItem("token");
   // const handle = location.state.isPractical;
 
   //Header to be send through post request

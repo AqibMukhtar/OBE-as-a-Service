@@ -7,14 +7,13 @@ import { DialogActions } from "@material-ui/core";
 import { useHistory, useLocation } from "react-router";
 import "./css/addAssessmentTool.css";
 
-const getTokken = localStorage.getItem("token");
-
 const DeleteAssessmentToolForm = () => {
   const [courseType, setCourseType] = useState("");
   const location = useLocation();
   const history = useHistory();
   const toolType = location.state.toolType;
   const handle = location.state.isPractical;
+  const getTokken = localStorage.getItem("token");
 
   //Header to be send through post request
   let axiosHeader = {
