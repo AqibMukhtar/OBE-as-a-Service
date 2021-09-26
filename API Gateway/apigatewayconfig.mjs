@@ -118,6 +118,22 @@ const configurationData = {
         {
           name: '/api/cds/teacher/view_assessment_tools/',
           authUsers: [1]
+        },
+        {
+          name: '/api/cds/view_name/',
+          authUsers: [1, 2, 3, 4]
+        },
+        {
+          name: '/api/cds/admin/uncommitted_clo_addition/',
+          authUsers: [3]
+        },
+        {
+          name: '/api/cds/admin/uncommitted_clo_updation/',
+          authUsers: [3]
+        },
+        {
+          name: '/api/cds/admin/uncommitted_clo_deletion/',
+          authUsers: [3]
         }
       ]
     },
@@ -172,6 +188,10 @@ const configurationData = {
         },
         {
           name: '/api/assessment_tool_definition/teacher/delete/final/practical/',
+          authUsers: [1]
+        },
+        {
+          name: '/api/assessment_tool_definition/teacher/mark_conducted/',
           authUsers: [1]
         }
         

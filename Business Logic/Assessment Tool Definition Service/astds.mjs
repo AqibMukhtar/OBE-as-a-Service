@@ -130,6 +130,23 @@ app.post('/api/assessment_tool_definition/teacher/delete/final/practical/', (req
   (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
 });
 
+
+app.post('/api/assessment_tool_definition/teacher/mark_conducted/', (req, res) => {
+  const {formData : {type, toolId}} = req.body;
+  switch(type) {
+    case 'Final':
+      db.query('CALL markFinalToolConducted(?)', [toolId],
+      (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+      break;
+    case 'Sessional':
+      db.query('CALL markSessionalToolConducted(?)', [toolId],
+      (err, result) => err ? res.sendStatus(400) : res.send(result[0])); 
+      break;
+    default:
+      res.sendStatus(400);
+  }
+});
+
 app.listen(port, () => {
   console.log('Assessment Tool Definition Service is running on port:', port);
 });

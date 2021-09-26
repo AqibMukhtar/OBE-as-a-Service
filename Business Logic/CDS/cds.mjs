@@ -39,6 +39,41 @@ app.get('/api/cds/teacher/view_assessment_tools/', (req, res) => {
   );
 });
 
+app.get('/api/cds/view_name/', (req, res) => {
+  const {uid, pid, tid} = req.query;
+  switch(tid) {
+    case '2':
+      db.query('CALL getOBEName(?,?)', [uid, pid],
+      (err, result) => err ? res.send(err) : res.send(result[0]));
+      break;
+    case '3':
+      db.query('CALL getAdminName(?,?)', [uid, pid], 
+      (err, result) => err ? res.sendStatus(400) : res.send(result[0]));
+      break;
+    default:
+      res.sendStatus(400);
+  }
+});
+
+
+app.get('/api/cds/admin/uncommitted_clo_addition/', (req, res) => {
+  const {pid : programId} = req.query;
+  db.query('CALL getAllUncommittedCLOAddition(?)', [programId], 
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0]));
+});
+
+app.get('/api/cds/admin/uncommitted_clo_updation/', (req, res) => {
+  const {pid : programId} = req.query;
+  db.query('CALL getAllUncommittedCLOUpdate(?)', [programId], 
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0]));
+});
+
+app.get('/api/cds/admin/uncommitted_clo_deletion/', (req, res) => {
+  const {pid : programId} = req.query;
+  db.query('CALL getAllUncommittedCLODeletion(?)', [programId], 
+  (err, result) => err ? res.sendStatus(400) : res.send(result[0]));
+});
+
 app.listen(port, () => {
   console.log('Content Delivery Service is running on port:', port);
 });

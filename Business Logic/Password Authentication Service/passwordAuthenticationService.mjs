@@ -39,12 +39,13 @@ app.post("/api/password_auth/", (req, res) => {
           if (err) res.send({});
           else if (result[0][0]["Authenticated"]) {
             const { teacherId, programId } = result[0][0];
-            res.send(
-              jwt.sign(
+            res.send({
+              "token" :jwt.sign(
                 { uid: teacherId, pid: programId, tid: 1 },
                 getJWTSecret()
-              )
-            );
+              ),
+              "user" : "teacher"
+            });
           } else res.send({});
         }
       );
@@ -57,9 +58,10 @@ app.post("/api/password_auth/", (req, res) => {
           if (err) res.send({});
           else if (result[0][0]["Authenticated"]) {
             const { obeId, programId } = result[0][0];
-            res.send(
-              jwt.sign({ uid: obeId, pid: programId, tid: 2 }, getJWTSecret())
-            );
+            res.send({
+              "token" : jwt.sign({ uid: obeId, pid: programId, tid: 2 }, getJWTSecret()),
+              "user" : "obecell"
+            });
           } else res.send({});
         }
       );
@@ -72,9 +74,10 @@ app.post("/api/password_auth/", (req, res) => {
           if (err || !result[0][0]["Authenticated"]) res.send({});
           else {
             const { adminId, programId } = result[0][0];
-            res.send(
-              jwt.sign({ uid: adminId, pid: programId, tid: 3 }, getJWTSecret())
-            );
+            res.send({
+              "token" : jwt.sign({ uid: adminId, pid: programId, tid: 3 }, getJWTSecret()),
+              "user" : "admin"
+            });
           }
         }
       );
