@@ -179,7 +179,6 @@ const AddAssessmentTool = () => {
         ? setCourseType("Practical")
         : setCourseType("Theory");
     }
-    console.log(courseType);
   };
 
   useEffect(() => {

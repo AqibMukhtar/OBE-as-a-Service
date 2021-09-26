@@ -179,7 +179,6 @@ const EditAssessmentToolForm = () => {
     {
       handle === 1 ? setCourseType("Practical") : setCourseType("Theory");
     }
-    console.log(courseType);
   };
 
   useEffect(() => {

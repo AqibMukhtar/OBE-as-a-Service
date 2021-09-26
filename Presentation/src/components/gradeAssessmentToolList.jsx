@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router";
 import axios from "axios";
+import { useLocation } from "react-router";
+import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -13,10 +15,6 @@ import RealNavbar from "./realNavbar";
 import Footer from "./footer";
 import { Button } from "@material-ui/core";
 import "./css/gradeButton.css";
-import { useHistory } from "react-router";
-import { toast } from "react-toastify";
-
-const getTokken = localStorage.getItem("token");
 
 // Defining table width
 const useStyles = makeStyles({
@@ -51,25 +49,30 @@ const GradeAssessmentTool = () => {
   const notConductedAssessmentTools = [];
   const classes = useStyles();
   const history = useHistory();
+  const getTokken = localStorage.getItem("token");
 
   const getAssessmentToolData = async () => {
     try {
-      const AssessmentToolBulkData = await axios.get(
-        "https://20.204.30.1/api/cds/teacher/view_assessment_tools/?courseId=" +
-          location.state.courseId +
-          "&batchId=" +
-          location.state.batchId +
-          "&programId=" +
-          location.state.programId,
-        {
-          headers: {
-            "X-Access-Token": getTokken,
-          },
-        }
-      );
-      setAssessmentToolBulkData(AssessmentToolBulkData.data.data);
-      console.log(assessmentToolBulkData);
-    } catch (error) {}
+      await axios
+        .get(
+          "https://20.204.30.1/api/cds/teacher/view_assessment_tools/?courseId=" +
+            location.state.courseId +
+            "&batchId=" +
+            location.state.batchId +
+            "&programId=" +
+            location.state.programId,
+          {
+            headers: {
+              "X-Access-Token": getTokken,
+            },
+          }
+        )
+        .then((response) => {
+          setAssessmentToolBulkData(response.data.data);
+        });
+    } catch (ex) {
+      toast.error(ex);
+    }
   };
 
   useEffect(() => {
@@ -104,9 +107,7 @@ const GradeAssessmentTool = () => {
         axiosHeader
       )
       .then(
-        (response) => {
-          console.log(response.data.Message);
-        },
+        (response) => {},
         (error) => {
           toast.error(error);
         }

@@ -24,6 +24,7 @@ import PLODescription from "./components/ploDescription";
 import AdminActions from "./components/adminActions";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import TeacherCourse from "./components/teacherCourse";
 
 function App() {
   return (
@@ -34,7 +35,7 @@ function App() {
           <Route path="/" exact component={LoginForm} />
           <Route path="/login" exact component={LoginForm} />
           <Route path="/logout" exact component={Logout} />
-          <Route path="/courses" component={TeacherCourseList} />
+          <Route path="/courses" component={TeacherCourse} />
           <Route path="/course/course-details" component={CourseActions} />
           <Route path="/course/course-detail/clo" component={CourseClo} />
           <Route
