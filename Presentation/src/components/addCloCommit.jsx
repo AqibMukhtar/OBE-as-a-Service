@@ -1,85 +1,60 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router";
-import axios from "axios";
-import { withStyles, makeStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import { useHistory } from "react-router-dom";
 import RealNavbar from "./realNavbar";
 import Footer from "./footer";
-import { Button } from "@material-ui/core";
-import "./css/gradeButton.css";
-import { useHistory } from "react-router";
-
-const getTokken = localStorage.getItem("token");
-
-// Defining table width
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
-
-//Styling the cells of the table
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: theme.palette.info.dark,
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
-
-//Styling the rows of the table
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}))(TableRow);
+import axios from "axios";
+import "./css/teacherCourse.css";
 
 const AddCLOCommit = () => {
-  const classes = useStyles();
-  const data = [];
+  const [addRequestData, setAddRequestData] = useState([]);
+  const history = useHistory();
+  const getTokken = localStorage.getItem("token");
 
-  const getCloRequestData = () => {};
+  const getAddRequestBulkData = async () => {
+    try {
+      await axios
+        .get("https://20.204.30.1/api/cds/admin/uncommitted_clo_addition/", {
+          headers: {
+            "X-Access-Token": getTokken,
+          },
+        })
+        .then((response) => {
+          setAddRequestData(response.data.data);
+        });
+    } catch (error) {}
+  };
+
+  const handleOnClick = (requestData) => {
+    history.push({
+      pathname: "/add-clo-commits/form",
+      state: {
+        selectedRequestData: requestData,
+      },
+    });
+  };
 
   useEffect(() => {
-    getCloRequestData();
-  });
+    getAddRequestBulkData();
+  }, []);
 
   return (
     <React.Fragment>
       <RealNavbar />
       <div className="container mt-4">
         <h2 className="heading">Add CLO Requests</h2>
-        <br />
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Request</StyledTableCell>
-                <StyledTableCell align="center">Commit</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((row) => (
-                <StyledTableRow key={row.id}>
-                  <StyledTableCell>{row.requestName}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Button className="grade-button">commit</Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {addRequestData.length === 0 ? (
+          <p className="para">No add requests are pending</p>
+        ) : (
+          addRequestData.map((requestData) => (
+            <button
+              type="button"
+              className="course-btn"
+              onClick={() => handleOnClick(requestData)}
+            >
+              Add CLO Request by {requestData.obeName}
+            </button>
+          ))
+        )}
       </div>
       <Footer />
     </React.Fragment>

@@ -4,7 +4,6 @@ import { ToastContainer } from "react-toastify";
 import LoginForm from "./components/loginForm";
 import Logout from "./components/logout";
 import CourseActions from "./components/courseActions";
-import TeacherCourseList from "./components/teacherCourseList";
 import CourseClo from "./components/courseClo";
 import AssessmentToolsActions from "./components/assessmentToolsActions";
 import ViewAssessmentTool from "./components/viewAssessmentTool";
@@ -22,9 +21,15 @@ import DeleteCLO from "./components/deleteClo";
 import PEODescription from "./components/peoDescription";
 import PLODescription from "./components/ploDescription";
 import AdminActions from "./components/adminActions";
+import TeacherCourse from "./components/teacherCourse";
+import AddCLOCommit from "./components/addCloCommit";
+import UpdateCLOCommit from "./components/updateCloCommit";
+import DeleteCLOCommit from "./components/deleteCloCommit";
+import CLOAddCommitForm from "./components/cloAddCommitForm";
+import CLOUpdateCommitForm from "./components/cloUpdateCommitForm";
+import CLODeleteCommitForm from "./components/cloDeleteCommitForm";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import TeacherCourse from "./components/teacherCourse";
 
 function App() {
   return (
@@ -81,6 +86,18 @@ function App() {
           <Route path="/update-clo" component={UpdateCLO} />
           <Route path="/delete-clo" component={DeleteCLO} />
           <Route path="/admin" component={AdminActions} />
+          <Route path="/add-clo-commit" component={AddCLOCommit} />
+          <Route path="/update-clo-commit" component={UpdateCLOCommit} />
+          <Route path="/delete-clo-commit" component={DeleteCLOCommit} />
+          <Route path="/add-clo-commits/form" component={CLOAddCommitForm} />
+          <Route
+            path="/update-clo-commits/form"
+            component={CLOUpdateCommitForm}
+          />
+          <Route
+            path="/delete-clo-commits/form"
+            component={CLODeleteCommitForm}
+          />
         </Switch>
       </div>
     </React.Fragment>
