@@ -20,7 +20,7 @@ const UpdateCLO = () => {
   const [taxonomyLevelDomain, setTaxonomyLevelDomain] = useState("");
   const [taxonomyLevelName, setTaxonomyLevelName] = useState("");
   const [description, setDescription] = useState("");
-  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [editNotes, setEditNotes] = useState("");
 
   let axiosHeader = {
     headers: {
@@ -37,7 +37,7 @@ const UpdateCLO = () => {
     taxonomyDomain: taxonomyLevelDomain,
     taxonomyLevelName: taxonomyLevelName,
     cloDescription: description,
-    additionalNotes: additionalNotes,
+    editNotes: editNotes,
   };
 
   const handleUpdate = () => {
@@ -193,15 +193,15 @@ const UpdateCLO = () => {
                     onChange={(e) => setDescription(e.target.value)}
                   />
                   <br></br>
-                  <label className="add-login-label">Additional Notes</label>
+                  <label className="add-login-label">Edit Notes</label>
                   <br></br>
                   <input
-                    id="additionalNotes"
+                    id="editNotes"
                     placeholder="optional"
-                    name="additionalNotes"
+                    name="editNotes"
                     className="add-txt-field-input"
-                    value={additionalNotes}
-                    onChange={(e) => setAdditionalNotes(e.target.value)}
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
                   />
                 </div>
               </div>

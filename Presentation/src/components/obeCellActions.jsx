@@ -49,11 +49,6 @@ const OBEcellActions = () => {
       pathname: "/delete-clo",
     });
   };
-  const handleOnClickCLORequest = () => {
-    history.push({
-      pathname: "/delete-clo",
-    });
-  };
 
   useEffect(() => {
     getData();

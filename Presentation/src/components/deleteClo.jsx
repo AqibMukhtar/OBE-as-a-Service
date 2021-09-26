@@ -17,7 +17,7 @@ const DeleteCLO = () => {
   const [isPractical, setIsPractical] = useState("");
   const [batchId, setBatchId] = useState("");
   const [cloName, setCloName] = useState("");
-  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [deleteNotes, setDeleteNotes] = useState("");
 
   let axiosHeader = {
     headers: {
@@ -31,7 +31,7 @@ const DeleteCLO = () => {
     isPractical: isPractical,
     batchId: batchId,
     cloName: cloName,
-    additionalNotes: additionalNotes,
+    deleteNotes: deleteNotes,
   };
 
   const handleDelete = () => {
@@ -148,15 +148,15 @@ const DeleteCLO = () => {
                     onChange={(e) => setCloName(e.target.value)}
                   />
                   <br></br>
-                  <label className="add-login-label">Additional Notes</label>
+                  <label className="add-login-label">Delete Notes</label>
                   <br></br>
                   <input
-                    id="additionalNotes"
+                    id="deleteNotes"
                     placeholder="optional"
-                    name="additionalNotes"
+                    name="deleteNotes"
                     className="add-txt-field-input"
-                    value={additionalNotes}
-                    onChange={(e) => setAdditionalNotes(e.target.value)}
+                    value={deleteNotes}
+                    onChange={(e) => setDeleteNotes(e.target.value)}
                   />
                 </div>
               </div>
