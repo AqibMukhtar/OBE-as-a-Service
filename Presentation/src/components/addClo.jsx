@@ -43,22 +43,26 @@ const AddCLO = () => {
   const handleAdd = () => {
     axios
       .post(
-        "https://127.0.0.1/api/clo_request/obe_cell/add_clo",
+        "https://20.204.30.1/api/clo_request/obe_cell/add_clo",
         data,
         axiosHeader
       )
       .then(
         (response) => {
-          if (response.data.data[0].Success === 1) {
-            toast.success(response.data.data[0].Message);
-            history.push({
-              pathname: "/obe-cell",
-            });
-            console.log("CLO added");
+          console.log(response);
+          try {
+            if (response.data.data.Success === 1) {
+              toast.success(response.data.data.Message);
+              history.push({
+                pathname: "/obe-cell",
+              });
+              console.log("CLO added");
+            } else if (response.data.data.Success === 0) {
+              toast.error(response.data.data.Message);
+            }
+          } catch (ex) {
+            toast.error("Invalid request");
           }
-
-          if (response.data.data[0].Success === 0)
-            toast.error(response.data.data[0].Message);
         },
         (error) => {
           toast.error(error);
@@ -96,6 +100,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="SE-301"
                     id="courseCode"
                     name="courseCode"
                     className="add-txt-field-input"
@@ -107,6 +112,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Software Quality Engineering"
                     id="courseName"
                     name="courseName"
                     className="add-txt-field-input"
@@ -118,6 +124,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Theory / Practical"
                     id="courseType"
                     name="courseType"
                     className="add-txt-field-input"
@@ -129,6 +136,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="2021"
                     id="batchId"
                     name="batchId"
                     className="add-txt-field-input"
@@ -142,6 +150,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Cognitive / Affective / Psychomotor"
                     id="taxonomyLevelDomain"
                     name="taxonomyLevelDomain"
                     className="add-txt-field-input"
@@ -153,6 +162,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Knowledge"
                     id="taxonomyLevelName"
                     name="taxonomyLevelName"
                     className="add-txt-field-input"
@@ -164,6 +174,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="PLO-01"
                     id="mappingToPLO"
                     name="mappingToPLO"
                     className="add-txt-field-input"
@@ -174,6 +185,7 @@ const AddCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="CLO description here"
                     id="CLODescription"
                     name="CLODescription"
                     className="add-txt-field-input"
@@ -184,6 +196,7 @@ const AddCLO = () => {
                   <label className="add-login-label">Additional Notes</label>
                   <br></br>
                   <input
+                    placeholder="optional"
                     id="additionalNotes"
                     name="additionalNotes"
                     className="add-txt-field-input"
@@ -197,7 +210,21 @@ const AddCLO = () => {
                   Cancel
                 </Button>{" "}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button onClick={handleAdd} className="dialog-button">
+                <Button
+                  disabled={
+                    !courseCode ||
+                    !courseName ||
+                    !courseType ||
+                    !isPractical ||
+                    !batchId ||
+                    !taxonomyLevelDomain ||
+                    !taxonomyLevelName ||
+                    !ploId ||
+                    !description
+                  }
+                  onClick={handleAdd}
+                  className="dialog-button"
+                >
                   Add
                 </Button>
               </DialogActions>

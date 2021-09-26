@@ -43,22 +43,25 @@ const UpdateCLO = () => {
   const handleUpdate = () => {
     axios
       .post(
-        "https://127.0.0.1/api/clo_request/obe_cell/update_clo",
+        "https://20.204.30.1/api/clo_request/obe_cell/update_clo",
         data,
         axiosHeader
       )
       .then(
         (response) => {
-          if (response.data.data[0].Success === 1) {
-            toast.success(response.data.data[0].Message);
-            history.push({
-              pathname: "/obe-cell",
-            });
-            console.log("CLO updated");
+          try {
+            if (response.data.data.Success === 1) {
+              toast.success(response.data.data.Message);
+              history.push({
+                pathname: "/obe-cell",
+              });
+              console.log("CLO updated");
+            } else if (response.data.data.Success === 0) {
+              toast.error(response.data.data.Message);
+            }
+          } catch (ex) {
+            toast.error("Invalid request");
           }
-
-          if (response.data.data[0].Success === 0)
-            toast.error(response.data.data[0].Message);
         },
         (error) => {
           toast.error(error);
@@ -96,6 +99,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="SE-301"
                     id="courseCode"
                     name="courseCode"
                     className="add-txt-field-input"
@@ -107,6 +111,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Software Quality Engineering"
                     id="courseName"
                     name="courseName"
                     className="add-txt-field-input"
@@ -118,6 +123,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Theory / Practical"
                     id="courseType"
                     name="courseType"
                     className="add-txt-field-input"
@@ -129,6 +135,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="2021"
                     id="batchId"
                     name="batchId"
                     className="add-txt-field-input"
@@ -140,6 +147,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="CLO-01"
                     id="cloName"
                     name="cloName"
                     className="add-txt-field-input"
@@ -153,6 +161,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     required
+                    placeholder="Cognitive / Affective / Psychomotor"
                     id="taxonomyLevelDomain"
                     name="taxonomyLevelDomain"
                     className="add-txt-field-input"
@@ -165,6 +174,7 @@ const UpdateCLO = () => {
                   <input
                     required
                     id="taxonomyLevelName"
+                    placeholder="Knowledge"
                     name="taxonomyLevelName"
                     className="add-txt-field-input"
                     value={taxonomyLevelName}
@@ -176,6 +186,7 @@ const UpdateCLO = () => {
                   <input
                     required
                     id="CLODescription"
+                    placeholder="CLO description here"
                     name="CLODescription"
                     className="add-txt-field-input"
                     value={description}
@@ -186,6 +197,7 @@ const UpdateCLO = () => {
                   <br></br>
                   <input
                     id="additionalNotes"
+                    placeholder="optional"
                     name="additionalNotes"
                     className="add-txt-field-input"
                     value={additionalNotes}
@@ -198,7 +210,21 @@ const UpdateCLO = () => {
                   Cancel
                 </Button>{" "}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button onClick={handleUpdate} className="dialog-button">
+                <Button
+                  disabled={
+                    !courseCode ||
+                    !courseName ||
+                    !courseType ||
+                    !isPractical ||
+                    !batchId ||
+                    !taxonomyLevelDomain ||
+                    !taxonomyLevelName ||
+                    !cloName ||
+                    !description
+                  }
+                  onClick={handleUpdate}
+                  className="dialog-button"
+                >
                   Update
                 </Button>
               </DialogActions>

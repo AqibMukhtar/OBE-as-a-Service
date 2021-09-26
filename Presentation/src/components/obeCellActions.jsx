@@ -2,14 +2,37 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useHistory, useLocation } from "react-router";
 import "./css/teacherCourse.css";
+import axios from "axios";
 import Footer from "./footer";
 import RealNavbar from "./realNavbar";
+
+const getTokken = localStorage.getItem("token");
 
 const OBEcellActions = () => {
   const location = useLocation();
   const history = useHistory();
   const [programName, setProgramName] = useState("");
   const [userName, setUserName] = useState("");
+  const [obeData, setObeData] = useState("");
+
+  const getData = async () => {
+    try {
+      const bulkData = await axios.get(
+        "https://20.204.30.1/api/cds/view_name",
+        {
+          headers: {
+            "X-Access-Token": getTokken,
+          },
+        }
+      );
+      setObeData(bulkData.data.data);
+      console.log(obeData);
+      setProgramName(obeData[0].programName);
+      setUserName(obeData[0].obeName);
+      console.log(programName);
+      console.log(userName);
+    } catch (error) {}
+  };
 
   const handleOnClickAddCLO = () => {
     history.push({
@@ -33,8 +56,7 @@ const OBEcellActions = () => {
   };
 
   useEffect(() => {
-    setProgramName("Software Engineering");
-    setUserName("Wahabuddin Usmani");
+    getData();
   });
 
   return (
@@ -64,13 +86,6 @@ const OBEcellActions = () => {
           className="course-btn"
         >
           Delete CLO
-        </button>
-        <button
-          onClick={handleOnClickCLORequest}
-          type="button"
-          className="course-btn"
-        >
-          CLO requests by teachers
         </button>
       </div>
       <Footer />
