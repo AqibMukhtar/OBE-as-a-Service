@@ -58,7 +58,7 @@ const DeleteAssessmentTool = () => {
         courseId: location.state.courseId,
         courseName: location.state.courseName,
         courseCode: location.state.courseCode,
-        sectionName: location.state.sectionName,
+        sectionName: selectedAssessmentTool.sectionName,
         programName: location.state.programName,
         isPractical: location.state.isPractical,
         toolType: selectedAssessmentTool.Type,
@@ -88,7 +88,7 @@ const DeleteAssessmentTool = () => {
             className="course-btn"
             onClick={() => handleDeleteButton(toolData)}
           >
-            {toolData.toolName}
+            {toolData.toolName} ({toolData.sectionName})
           </button>
         ))}
       </div>

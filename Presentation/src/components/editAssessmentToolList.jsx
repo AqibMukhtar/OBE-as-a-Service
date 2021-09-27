@@ -66,7 +66,7 @@ const EditAssessmentTool = () => {
         courseId: location.state.courseId,
         courseName: location.state.courseName,
         courseCode: location.state.courseCode,
-        sectionName: location.state.sectionName,
+        sectionName: selectedAssessmentTool.sectionName,
         programName: location.state.programName,
         isPractical: location.state.isPractical,
         toolType: selectedAssessmentTool.Type,
@@ -96,7 +96,7 @@ const EditAssessmentTool = () => {
             className="course-btn"
             onClick={() => handleEditButton(toolData)}
           >
-            {toolData.toolName}
+            {toolData.toolName} ({toolData.sectionName})
           </button>
         ))}
       </div>
